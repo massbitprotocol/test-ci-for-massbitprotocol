@@ -8,19 +8,19 @@ on:
 
 jobs:
   # Running compilation check
-  check:
-    name: Check
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: stable
-          override: true
-      - uses: actions-rs/cargo@v1
-        with:
-          command: check
+  # check:
+  #   name: Check
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - uses: actions-rs/toolchain@v1
+  #       with:
+  #         profile: minimal
+  #         toolchain: stable
+  #         override: true
+  #     - uses: actions-rs/cargo@v1
+  #       with:
+  #         command: check
   # Running format check
   fmt:
     name: Rustfmt
@@ -66,12 +66,16 @@ jobs:
       #       ~/.cargo/registry/cache
       #       target
       #     key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('Cargo.lock') }}
-      - name: Generate test result and coverage report
+      - uses: Swatinem/rust-cache@v1
+      - name: Run test without coverage
         run: |
-          cargo install cargo2junit grcov;
-          cargo test $CARGO_OPTIONS -- -Z unstable-options --format json | cargo2junit > results.xml;
-          zip -0 ccov.zip `find . \( -name "$PROJECT_NAME_UNDERSCORE*.gc*" \) -print`;
-          grcov ccov.zip -s . -t lcov --llvm --ignore-not-existing --ignore "/*" --ignore "tests/*" -o lcov.info;
+          cargo test
+      # - name: Generate test result and coverage report
+      #   run: |
+      #     cargo install cargo2junit grcov;
+      #     cargo test $CARGO_OPTIONS -- -Z unstable-options --format json | cargo2junit > results.xml;
+      #     zip -0 ccov.zip `find . \( -name "$PROJECT_NAME_UNDERSCORE*.gc*" \) -print`;
+      #     grcov ccov.zip -s . -t lcov --llvm --ignore-not-existing --ignore "/*" --ignore "tests/*" -o lcov.info;
       # - name: Upload test results
       #   uses: EnricoMi/publish-unit-test-result-action@v1
       #   with:
@@ -95,6 +99,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - uses: Swatinem/rust-cache@v1
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
@@ -102,9 +107,8 @@ jobs:
           target: wasm32-unknown-unknown
           override: true
       - name: Install missing dependencies
-        run: sudo apt install -y cmake pkg-config libssl-dev git gcc build-essential clang libclang-dev libpq-dev libudev-dev zlib1g-dev llvm make
-      - name: Install nightly for building dependencies
         run: |
+          sudo apt install -y cmake pkg-config libssl-dev git gcc build-essential clang libclang-dev libpq-dev libudev-dev zlib1g-dev llvm make
           rustup toolchain install nightly-2021-05-20
           rustup target add wasm32-unknown-unknown --toolchain nightly-2021-05-20
       - name: Release Build
