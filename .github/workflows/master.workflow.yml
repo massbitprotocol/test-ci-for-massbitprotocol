@@ -89,7 +89,6 @@ jobs:
   # Running cargo build
   build:
     # needs: [check, fmt, test]
-    # needs: [check, fmt] 
     name: Build
     env:
       PROJECT_NAME_UNDERSCORE: index-manager-main
@@ -111,7 +110,7 @@ jobs:
   
   # Running docker
   docker:
-    # needs: [build] 
+    needs: [build] 
     name: Docker
     runs-on: ubuntu-latest
     steps:
