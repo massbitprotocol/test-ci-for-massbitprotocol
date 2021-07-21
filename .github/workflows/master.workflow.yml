@@ -130,6 +130,9 @@ jobs:
         with:
           images: my-docker-hub-namespace/my-docker-hub-repository
       
+      - name: Download all workflow run artifacts
+        uses: actions/download-artifact@v2
+
       - name: Build and push Docker image
         uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
         with:
