@@ -89,7 +89,7 @@ jobs:
   # Running cargo build
   build:
     # needs: [check, fmt, test]
-    needs: [check, fmt] 
+    # needs: [check, fmt] 
     name: Build
     env:
       PROJECT_NAME_UNDERSCORE: index-manager-main
