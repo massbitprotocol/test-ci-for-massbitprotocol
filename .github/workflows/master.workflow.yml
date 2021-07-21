@@ -110,7 +110,7 @@ jobs:
   #         path: target/release/${{ env.PROJECT_NAME_UNDERSCORE }}
   # Running docker
   docker:
-    needs: [build] 
+    # needs: [build] 
     name: Docker
     runs-on: ubuntu-latest
     steps:
