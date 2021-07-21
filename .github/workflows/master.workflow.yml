@@ -87,27 +87,27 @@ jobs:
   #     #     fail_ci_if_error: true
 
   # Running cargo build
-  # build:
-  #   # needs: [check, fmt, test]
-  #   needs: [check, fmt] 
-  #   name: Build
-  #   env:
-  #     PROJECT_NAME_UNDERSCORE: index-manager-main
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - uses: actions-rs/toolchain@v1
-  #       with:
-  #         profile: minimal
-  #         toolchain: stable
-  #         override: true
-  #     - name: Release Build
-  #       run: cargo build --release
-  #     - name: 'Upload Artifact'
-  #       uses: actions/upload-artifact@v2
-  #       with:
-  #         name: ${{ env.PROJECT_NAME_UNDERSCORE }}
-  #         path: target/release/${{ env.PROJECT_NAME_UNDERSCORE }}
+  build:
+    # needs: [check, fmt, test]
+    needs: [check, fmt] 
+    name: Build
+    env:
+      PROJECT_NAME_UNDERSCORE: index-manager-main
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+      - name: Release Build
+        run: cargo build --release
+      - name: 'Upload Artifact'
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.PROJECT_NAME_UNDERSCORE }}
+          path: target/release/${{ env.PROJECT_NAME_UNDERSCORE }}
   
   # Running docker
   docker:
