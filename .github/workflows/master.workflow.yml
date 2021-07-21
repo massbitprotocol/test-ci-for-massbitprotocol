@@ -101,7 +101,7 @@ jobs:
           toolchain: stable
           override: true
       - name: Install missing dependencies
-        run: apt install -y cmake pkg-config libssl-dev git gcc build-essential clang libclang-dev libpq-dev 
+        run: sudo apt install -y cmake pkg-config libssl-dev git gcc build-essential clang libclang-dev libpq-dev 
       - name: Release Build
         run: cargo build --release
       - name: 'Upload Artifact'
