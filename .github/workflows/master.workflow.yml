@@ -99,9 +99,14 @@ jobs:
         with:
           profile: minimal
           toolchain: stable
+          target: wasm32-unknown-unknown
           override: true
       - name: Install missing dependencies
         run: sudo apt install -y cmake pkg-config libssl-dev git gcc build-essential clang libclang-dev libpq-dev libudev-dev zlib1g-dev llvm make
+      - name: Install nightly for building dependencies
+        run: |
+          rustup toolchain install nightly-2021-05-20
+          rustup target add wasm32-unknown-unknown --toolchain nightly-2021-05-20
       - name: Release Build
         run: cargo build --release
       - name: 'Upload Artifact'
