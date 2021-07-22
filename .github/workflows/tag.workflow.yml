@@ -107,7 +107,7 @@ jobs:
       - name: Get our docker file to the main source so we have the massbitprotcol app context
         run: cp deployment/code-compiler/Dockerfile Dockerfile
       - name: Build and push code-compiler image
-        uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
+        uses: docker/build-push-action@v2
         with:
           context: .
           push: true
