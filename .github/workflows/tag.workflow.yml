@@ -63,7 +63,7 @@ jobs:
   ################## 
   docker-cargo:
     needs: [build-cargo] 
-    name: Docker
+    name: Docker Cargo
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repo
@@ -100,7 +100,7 @@ jobs:
 
   docker-python:
     needs: [build-python] 
-    name: Docker
+    name: Docker Python
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repo
