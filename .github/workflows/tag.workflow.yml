@@ -30,19 +30,19 @@ jobs:
           rustup toolchain install nightly-2021-05-20
           rustup target add wasm32-unknown-unknown --toolchain nightly-2021-05-20
 
-      - name: Release Build
+      - name: Build release
         run: cargo build --release
 
       - name: List release files
         run: ls /target/release
 
-      - name: Upload Chain Reader Artifact # We will use it in the next docker step 
+      - name: Upload chain-reader artifact # We will use it in the next docker step 
         uses: actions/upload-artifact@v2
         with:
           name: ${{ env.ARTIFACT }}
           path: target/release/${{ env.CHAIN_READER }}
 
-      - name: Upload Indexer Artifact # We will use it in the next docker step 
+      - name: Upload indexer artifact # We will use it in the next docker step 
         uses: actions/upload-artifact@v2
         with:
           name: ${{ env.ARTIFACT }}
