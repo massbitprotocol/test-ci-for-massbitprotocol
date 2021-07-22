@@ -10,7 +10,7 @@ jobs:
   # Running build #
   ################# 
   build-cargo:
-    name: Build Cargo (Chain Reader & Indexer)
+    name: Build Chain Reader & Indexer
     env:
       CHAIN_READER: chain-reader
       INDEXER: indexer-manager-main
@@ -50,7 +50,7 @@ jobs:
   ################## 
   docker-cargo:
     needs: [build-cargo] 
-    name: Docker Cargo (Chain Reader & Indexer)
+    name: Docker Chain Reader & Indexer
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repo
@@ -86,7 +86,7 @@ jobs:
           labels: indexer
 
   docker-python:
-    name: Docker Python (Code compiler)
+    name: Docker code compiler
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repo
@@ -96,6 +96,11 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
+        with:
+          images: sprise/code-compiler
       - name: Extract source (branch, name, tag)
         id: source_info
         run: |
@@ -115,7 +120,7 @@ jobs:
           labels: code-compiler
 
   docker-dashboard:
-    name: Docker Dashboard
+    name: Docker dashboard
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repo
@@ -125,6 +130,11 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
+        with:
+          images: sprise/dashboard
       - name: Extract source (branch, name, tag)
         id: source_info
         run: |
