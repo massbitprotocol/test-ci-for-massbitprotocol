@@ -25,18 +25,23 @@ jobs:
           override: true
       - name: Install missing dependencies
         run: |
+          sudo apt update
           sudo apt install -y cmake pkg-config libssl-dev git gcc build-essential clang libclang-dev libpq-dev libudev-dev zlib1g-dev llvm make
           rustup toolchain install nightly-2021-05-20
           rustup target add wasm32-unknown-unknown --toolchain nightly-2021-05-20
+
       - name: Release Build
         run: cargo build --release
+
       - name: List release files
         run: ls /target/release
+
       - name: Upload Chain Reader Artifact # We will use it in the next docker step 
         uses: actions/upload-artifact@v2
         with:
           name: ${{ env.ARTIFACT }}
           path: target/release/${{ env.CHAIN_READER }}
+
       - name: Upload Indexer Artifact # We will use it in the next docker step 
         uses: actions/upload-artifact@v2
         with:
