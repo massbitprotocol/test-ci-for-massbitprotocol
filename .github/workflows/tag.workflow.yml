@@ -13,7 +13,7 @@ jobs:
     name: Build Chain Reader & Indexer
     env:
       CHAIN_READER: chain-reader
-      INDEXER: indexer-manager-main
+      INDEXER: index-manager-main
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -39,11 +39,11 @@ jobs:
         with:
           name: ${{ env.CHAIN_READER }}
           path: target/release/${{ env.CHAIN_READER }}
-      - name: Upload indexer artifact # We will use it in the next docker step 
-        uses: actions/upload-artifact@v2
-        with:
-          name: ${{ env.INDEXER }}
-          path: target/release/${{ env.INDEXER }}
+      # - name: Upload indexer artifact # We will use it in the next docker step 
+      #   uses: actions/upload-artifact@v2
+      #   with:
+      #     name: ${{ env.INDEXER }}
+      #     path: target/release/${{ env.INDEXER }}
 
   ##################
   # Running docker #
@@ -77,13 +77,13 @@ jobs:
           push: true
           tags: ${{ steps.source_info.outputs.SOURCE_TAG }}
           labels: chain-reader
-      - name: Build and push indexer docker image
-        uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
-        with:
-          context: ./deployment/indexer
-          push: true
-          tags: ${{ steps.branch_info.outputs.SOURCE_TAG }}
-          labels: indexer
+      # - name: Build and push indexer docker image
+      #   uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
+      #   with:
+      #     context: ./deployment/indexer
+      #     push: true
+      #     tags: ${{ steps.branch_info.outputs.SOURCE_TAG }}
+      #     labels: indexer
 
   docker-python:
     name: Docker code compiler
