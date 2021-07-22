@@ -45,25 +45,12 @@ jobs:
           name: ${{ env.INDEXER }}
           path: target/release/${{ env.INDEXER }}
 
-  build-python:
-    name: Build Python (Code-compiler)
-    env:
-      CODE_COMPILER: CODE_COMPILER
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Upload code-compiler artifact # We will use it in the next docker step 
-        uses: actions/upload-artifact@v2
-        with:
-          name: ${{ env.CODE_COMPILER }}
-          path: .
-
   ##################
   # Running docker #
   ################## 
   docker-cargo:
     needs: [build-cargo] 
-    name: Docker Cargo
+    name: Docker Cargo (Chain Reader & Indexer)
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repo
@@ -99,8 +86,7 @@ jobs:
           labels: indexer
 
   docker-python:
-    needs: [build-python] 
-    name: Docker Python
+    name: Docker Python (Code compiler)
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repo
@@ -116,14 +102,14 @@ jobs:
           echo ::set-output name=SOURCE_NAME::${GITHUB_REF#refs/*/}
           echo ::set-output name=SOURCE_BRANCH::${GITHUB_REF#refs/heads/}
           echo ::set-output name=SOURCE_TAG::${GITHUB_REF#refs/tags/}
-      - name: Download all workflow run artifacts
-        uses: actions/download-artifact@v2
       - name: List files
         run: ls -ll
+      - name: Get our docker file to the main source so we have the massbitprotcol app context
+        run: cp deployment/code-compiler/Dockerfile Dockerfile
       - name: Build and push code-compiler image
         uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
         with:
-          context: ./deployment/code-compiler
+          context: .
           push: true
           tags: ${{ steps.source_info.outputs.SOURCE_TAG }}
           labels: code-compiler
