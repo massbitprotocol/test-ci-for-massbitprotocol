@@ -33,7 +33,7 @@ jobs:
       - name: Build release
         run: cargo build --release
       - name: List release files
-        run: ls /target/release
+        run: ls -ll target/release
       - name: Upload chain-reader artifact # We will use it in the next docker step 
         uses: actions/upload-artifact@v2
         with:
