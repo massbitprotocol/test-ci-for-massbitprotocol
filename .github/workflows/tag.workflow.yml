@@ -8,7 +8,6 @@ on:
 jobs:
   # Running cargo build
   build:
-    needs: [test]
     name: Build
     env:
       ARTIFACT: massbitprotocol-artifact
