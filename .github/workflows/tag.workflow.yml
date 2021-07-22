@@ -65,8 +65,10 @@ jobs:
         uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
         with:
           images: sprise/chain-reader
-      - name: Download all workflow run artifacts
+      - name: Download artifact
         uses: actions/download-artifact@v2
+        with:
+          name: chain-reader
       - name: List files
         run: ls -ll
       - name: Build and push image
@@ -94,8 +96,10 @@ jobs:
         uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
         with:
           images: sprise/indexer
-      - name: Download all workflow run artifacts
+      - name: Download artifact
         uses: actions/download-artifact@v2
+        with:
+          name: index-manager-main
       - name: List files
         run: ls -ll
       - name: Build and push image
