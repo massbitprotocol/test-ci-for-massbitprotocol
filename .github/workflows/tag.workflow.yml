@@ -120,10 +120,10 @@ jobs:
         uses: actions/download-artifact@v2
       - name: List files
         run: ls -ll
-      - name: Build and push chain-reader docker image
+      - name: Build and push code-compiler image
         uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
         with:
           context: ./deployment/code-compiler
           push: true
           tags: ${{ steps.source_info.outputs.SOURCE_TAG }}
-          labels: chain-reader
+          labels: code-compiler
