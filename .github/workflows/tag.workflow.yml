@@ -31,6 +31,12 @@ jobs:
           rustup target add wasm32-unknown-unknown --toolchain nightly-2021-05-20
       - name: Build release
         run: cargo build --release
+
+      - name: Allow chain-reader binary to be executable
+        run: sudo chmod +x target/release/chain-reader/chain-reader
+      - name: Allow index-manager-main binary to be executable
+        run: sudo chmod +x target/release/index-manager-main
+
       - name: List release files
         run: ls -ll target/release
       - name: Upload chain-reader artifact 
