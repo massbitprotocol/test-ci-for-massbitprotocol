@@ -33,11 +33,15 @@ jobs:
         run: cargo build --release
       - name: List release files
         run: ls /target/release
-      - name: Upload Artifact
+      - name: Upload Chain Reader Artifact # We will use it in the next docker step 
         uses: actions/upload-artifact@v2
         with:
           name: ${{ env.ARTIFACT }}
           path: target/release/${{ env.CHAIN_READER }}
+      - name: Upload Indexer Artifact # We will use it in the next docker step 
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.ARTIFACT }}
           path: target/release/${{ env.INDEXER }}
   
   # Building docker image and upload to docker hub
@@ -80,4 +84,4 @@ jobs:
           push: true
           tags: ${{ steps.branch_info.outputs.SOURCE_TAG }}
           labels: indexer
-          
+
