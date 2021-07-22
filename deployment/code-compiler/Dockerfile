@@ -19,7 +19,7 @@ RUN apt install -y python3 python3-pip wget unzip
 RUN pip3 install -U Flask
 RUN pip3 install -U flask-cors
 RUN pip3 install -U ipfshttpclient
-RUN wget https://code-compiler-built-target.s3.ap-southeast-2.amazonaws.com/target.zip
+RUN wget https://code-compiler-built-target.s3.ap-southeast-2.amazonaws.com/target.zip -q --show-progress
 
 COPY ./ massbitprotocol
 
