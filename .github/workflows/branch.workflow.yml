@@ -1,8 +1,12 @@
-name: Worflow for Master branch
+name: Workflow for Feature branches
 
 on:
   push:
-    branches: [ master ]
+    branches:    
+      - '*'         # matches every branch that doesn't contain a '/'
+      - '*/*'       # matches every branch containing a single '/'
+      - '**'        # matches every branch
+      - '!master'   # excludes master
 
 jobs:
   # Running test
@@ -25,6 +29,6 @@ jobs:
           rustup toolchain install nightly-2021-05-20
           rustup target add wasm32-unknown-unknown --toolchain nightly-2021-05-20
       - uses: Swatinem/rust-cache@v1
-      - name: Run test
+      - name: Run test without coverage
         run: |
           cargo test
