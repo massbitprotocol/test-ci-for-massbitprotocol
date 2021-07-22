@@ -1,6 +1,6 @@
 FROM rust
 COPY . .
 RUN ls -ll
-RUN ["chmod", "+x", "chain-reader"]
+RUN ["chmod", "+x", "target/release/chain-reader"]
 RUN ls -ll
-CMD .chain-reader
+CMD ./target/release/chain-reader
