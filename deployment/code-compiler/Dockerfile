@@ -21,6 +21,7 @@ RUN pip3 install -U flask-cors
 RUN pip3 install -U ipfshttpclient
 RUN wget https://code-compiler-built-target.s3.ap-southeast-2.amazonaws.com/target.zip -q --show-progress
 
+RUN ls -ll
 COPY ./ massbitprotocol
 
 RUN ls -ll
