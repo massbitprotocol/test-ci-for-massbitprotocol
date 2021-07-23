@@ -1,9 +1,13 @@
 name: Workflow for Tag
 
 on:
-  create:
-    tags:
-      - v*
+  push:
+    branches: [ master ]
+
+# on:
+#   create:
+#     tags:
+#       - v*
 
 jobs:
   #################
@@ -33,7 +37,7 @@ jobs:
         run: cargo build --release
 
       - name: Allow chain-reader binary to be executable
-        run: sudo chmod +x target/release/chain-reader/chain-reader
+        run: sudo chmod +x target/release/chain-reader
       - name: Allow index-manager-main binary to be executable
         run: sudo chmod +x target/release/index-manager-main
 
