@@ -1,11 +1,7 @@
-# Docker file for building code-compiler
-FROM ubuntu:18.04
+FROM node:14-alpine
 
 RUN apt update
-RUN apt install -y git curl
 RUN apt install -y npm
-RUN curl -fsSL https://deb.nodesource.com/setup_14.x | bash -
-RUN apt-get install -y nodejs
 
 RUN git clone https://github.com/massbitprotocol/dashboard
 WORKDIR "dashboard"
