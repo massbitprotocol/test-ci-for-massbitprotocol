@@ -1,9 +1,9 @@
 name: Workflow for Tag
 
 on:
-  create:
+  push:
     branches:
-      - "!*"
+      - '**'
     tags:
       - "v*"
 
@@ -156,4 +156,3 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          
