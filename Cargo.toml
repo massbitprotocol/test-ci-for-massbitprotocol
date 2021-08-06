@@ -12,7 +12,7 @@ members = [
     "user-example/solana/index-serum",
     "plugin/test-plugin",
     "core/chain/solana",
-    "cli"  
+    "cli"   
 ]
 exclude = ["code-compiler/generated"]
 
