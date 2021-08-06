@@ -14,16 +14,19 @@ jobs:
      runs-on: ubuntu-latest
      steps:
        - uses: actions/checkout@v2
-       - uses: actions-rs/toolchain@v1
-         with:
-           profile: minimal
-           toolchain: 1.53.0
-           target: wasm32-unknown-unknown
-           override: true
-       - name: Install missing dependencies
+      #  - uses: actions-rs/toolchain@v1
+      #    with:
+      #      profile: minimal
+      #      toolchain: 1.53.0
+      #      target: wasm32-unknown-unknown
+      #      override: true
+       - name: Install Rust and missing dependencies
          run: |
            sudo apt update
            sudo apt install -y cmake pkg-config libssl-dev git gcc build-essential clang libclang-dev libpq-dev libudev-dev zlib1g-dev llvm make
+           rustup install 1.53.0
+           rustup default 1.53.0-x86_64-unknown-linux-gnu
+           rustup target add wasm32-unknown-unknown --toolchain 1.53.0-x86_64-unknown-linux-gnu
            rustup show
            rustup toolchain install nightly-2021-05-20
            rustup target add wasm32-unknown-unknown --toolchain nightly-2021-05-20
