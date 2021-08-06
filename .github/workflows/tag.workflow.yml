@@ -3,7 +3,7 @@ name: Workflow for Tag
 on:
   push:
     branches:
-      - '**'
+      - '!*'
     tags:
       - "v*"
 
