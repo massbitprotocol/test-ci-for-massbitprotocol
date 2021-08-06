@@ -14,16 +14,17 @@ use tera::{Context, Tera};
 pub fn run(matches: &ArgMatches) -> Result<(), Box<dyn Error>> {
     let schema_path = matches.value_of("schema").unwrap_or("schema.graphql");
     let output = matches.value_of("output").unwrap_or("src");
+    let mapping_gen = matches.is_present("mapping_gen");
     generate_rust_entity(schema_path, output)?;
 
     let config_path = matches.value_of("config").unwrap_or("project.yaml");
-    generate_plugin(config_path, output)?;
+    generate_plugin(config_path, output, mapping_gen)?;
     Ok(())
 }
 
 #[derive(Serialize)]
 pub struct EntityBinding {
-    pub entities: HashMap<String, String>,
+    pub entities: HashMap<String, (String,String)>,
 }
 
 fn generate_rust_entity(schema_path: &str, output: &str) -> Result<(), Box<dyn Error>> {
@@ -35,15 +36,16 @@ fn generate_rust_entity(schema_path: &str, output: &str) -> Result<(), Box<dyn E
         entities: HashMap::new(),
     };
     for (name, model) in layout.models.into_iter() {
-        let mut s = String::new();
-        model.as_rust_struct(&mut s)?;
-        binding.entities.insert(name, s);
+        let mut entity = String::new();
+        model.as_rust(&mut entity)?;
+        let table_name = name.clone().to_snake_case();
+        binding.entities.insert(name, (table_name, entity));
     }
 
     let mut tera = Tera::default();
-    tera.add_raw_template("model", include_str!("templates/model.rs.tmpl"))?;
-    let data = tera.render("model", &Context::from_serialize(binding)?)?;
-    fs::write(format!("{}/model.rs", output), data)?;
+    tera.add_raw_template("models", include_str!("templates/models.rs.tmpl"))?;
+    let data = tera.render("models", &Context::from_serialize(binding)?)?;
+    fs::write(format!("{}/models.rs", output), data)?;
 
     Ok(())
 }
@@ -59,7 +61,7 @@ pub struct Handler {
     pub kind: String,
 }
 
-fn generate_plugin(config_path: &str, output: &str) -> Result<(), Box<dyn Error>> {
+fn generate_plugin(config_path: &str, output: &str, mapping_gen: bool) -> Result<(), Box<dyn Error>> {
     let f = File::open(config_path)?;
     let manifest: serde_yaml::Value = serde_yaml::from_reader(f)?;
     let mut binding = HandlerBinding::default();
@@ -81,9 +83,11 @@ fn generate_plugin(config_path: &str, output: &str) -> Result<(), Box<dyn Error>
     let data = tera.render("lib", &Context::from_serialize(&binding)?)?;
     fs::write(format!("{}/lib.rs", output), data)?;
 
-    tera.add_raw_template("mapping", include_str!("templates/mapping.rs.tmpl"))?;
-    let data = tera.render("mapping", &Context::from_serialize(&binding)?)?;
-    fs::write(format!("{}/mapping.rs", output), data)?;
+    if mapping_gen {
+        tera.add_raw_template("mapping", include_str!("templates/mapping.rs.tmpl"))?;
+        let data = tera.render("mapping", &Context::from_serialize(&binding)?)?;
+        fs::write(format!("{}/mapping.rs", output), data)?;
+    }
 
     Ok(())
 }

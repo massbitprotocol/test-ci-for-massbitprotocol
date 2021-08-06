@@ -2,7 +2,8 @@
 
 ## Usage
 ```shell
-cargo run -- codegen --schema schema.graphql --config project.yaml --ouput src 
+cd cli
+cargo run -- codegen -s example/schema.graphql -c example/project.yaml -o example/
 ```
 
 ## Input templates

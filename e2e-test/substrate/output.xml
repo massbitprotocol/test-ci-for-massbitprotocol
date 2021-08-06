@@ -1,0 +1,575 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot generator="Robot 4.1 (Python 3.8.5 on linux)" generated="20210804 19:06:39.947" rpa="false" schemaversion="2">
+<suite id="s1" name="Substrate" source="/home/hughie/8-2021/massbitprotocol/e2e-test/substrate/substrate.robot">
+<test id="s1-t1" name="Check code-compiler is up">
+<kw name="GET" library="RequestsLibrary">
+<var>${response}</var>
+<arg>${CODE_COMPILER}</arg>
+<doc>Sends a GET request.</doc>
+<msg timestamp="20210804 19:06:40.023" level="INFO">GET Request : url=http://localhost:5000/ 
+ path_url=/ 
+ headers={'User-Agent': 'python-requests/2.24.0', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive'} 
+ body=None 
+ </msg>
+<msg timestamp="20210804 19:06:40.023" level="INFO">GET Response : url=http://localhost:5000/ 
+ status=200, reason=OK 
+ headers={'Content-Type': 'text/html; charset=utf-8', 'Content-Length': '36', 'Access-Control-Allow-Origin': '*', 'Server': 'Werkzeug/1.0.1 Python/3.8.10', 'Date': 'Wed, 04 Aug 2021 12:06:40 GMT'} 
+ body=Code compiler server is up &amp; running 
+ </msg>
+<msg timestamp="20210804 19:06:40.023" level="INFO">${response} = &lt;Response [200]&gt;</msg>
+<status status="PASS" starttime="20210804 19:06:40.019" endtime="20210804 19:06:40.023"/>
+</kw>
+<status status="PASS" starttime="20210804 19:06:40.019" endtime="20210804 19:06:40.024"/>
+</test>
+<test id="s1-t2" name="Check index-manager is up">
+<kw name="GET" library="RequestsLibrary">
+<var>${response}</var>
+<arg>${INDEX_MANAGER}</arg>
+<doc>Sends a GET request.</doc>
+<msg timestamp="20210804 19:06:40.037" level="INFO">GET Request : url=http://localhost:3000/ 
+ path_url=/ 
+ headers={'User-Agent': 'python-requests/2.24.0', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive'} 
+ body=None 
+ </msg>
+<msg timestamp="20210804 19:06:40.037" level="INFO">GET Response : url=http://localhost:3000/ 
+ status=200, reason=OK 
+ headers={'X-Powered-By': 'Express', 'Content-Type': 'text/html; charset=utf-8', 'Content-Length': '1540', 'ETag': 'W/"604-YwtN9x5wkh54oU+Qi6dNYw/iVx0"', 'Date': 'Wed, 04 Aug 2021 12:06:40 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=5'} 
+ body=&lt;!doctype html&gt;
+&lt;html lang="en-US" data-reactroot=""&gt;&lt;head&gt;&lt;link rel="icon" type="image/png" href="/rstatic/favicon_green.png"/&gt;&lt;script&gt;
+  window.__env = {
+  dataApiUrl: 'http://localhost:8080',
+  isAdminSecretSet: 'undefined',
+  consoleMode: 'server',
+  nodeEnv: 'development',
+  serverVersion: 'v1.0.0',
+  urlPrefix: '/',
+  consolePath: 'undefined',
+  enableTelemetry: true,
+  assetsPath: 'https://graphql-engine-cdn.hasura.io/console/assets',
+  assetsVersion: 'channel/stable/v1.0',
+  cdnAssets: true,
+  herokuOAuthClientId: '',
+  tenantID: '',
+  projectID: '',
+  cloudRootDomain: 'undefined'
+};
+&lt;/script&gt;&lt;/head&gt;&lt;body&gt;&lt;style&gt;
+          .content {
+            display: 'none';
+            opacity: 0;
+            transition: opacity .20s linear;
+          }
+          .content.show {
+            display: 'block';
+            opacity: 1;
+            transition: opacity .20s linear;
+          }
+        &lt;/style&gt;&lt;div id="loading"&gt;&lt;div class="page-loading" style="
+              min-height: 100vh;
+              width: 100%;
+              display: flex;
+              align-items: center;
+              font-family: sans-serif;
+              justify-content: center;
+          "&gt;
+          &lt;span class="" style="
+              font-size: 2em;
+              margin-top: -3em;
+              color: #848484;
+          "&gt;
+            Loading...
+            &lt;/span&gt;
+          &lt;/div&gt;&lt;/div&gt;&lt;div id="content" class="content"&gt;&lt;/div&gt;&lt;script src="http://127.0.0.1:3001/rstatic/dist/main-b5fa41be232b6ce2cff4.js" charSet="UTF-8"&gt;&lt;/script&gt;&lt;/body&gt;&lt;/html&gt; 
+ </msg>
+<msg timestamp="20210804 19:06:40.037" level="INFO">${response} = &lt;Response [200]&gt;</msg>
+<status status="PASS" starttime="20210804 19:06:40.025" endtime="20210804 19:06:40.037"/>
+</kw>
+<kw name="Load Json" library="Request">
+<var>${object}</var>
+<arg>${JSON_PAYLOAD}</arg>
+<msg timestamp="20210804 19:06:40.038" level="INFO">${object} = {'schema.graphql': 'type+SubstrateExtrinsicTest+%40entity+%7B%0D%0A++++id%3A+ID%21%0D%0A++++block_number%3A+BigInt%21%0D%0A++++extrinsic%3A+String%21%0D%0A%7D', 'mapping.rs': 'use+crate%3A%3Amodels%3A...</msg>
+<status status="PASS" starttime="20210804 19:06:40.037" endtime="20210804 19:06:40.038"/>
+</kw>
+<kw name="Post Request" library="Request">
+<var>${compile_res}</var>
+<arg>${CODE_COMPILER}/compile</arg>
+<arg>${object}</arg>
+<msg timestamp="20210804 19:06:47.589" level="INFO">{'schema.graphql': 'type+SubstrateExtrinsicTest+%40entity+%7B%0D%0A++++id%3A+ID%21%0D%0A++++block_number%3A+BigInt%21%0D%0A++++extrinsic%3A+String%21%0D%0A%7D', 'mapping.rs': 'use+crate%3A%3Amodels%3A%3A%2A%3B%0D%0Ause+massbit_chain_substrate%3A%3Adata_type+as+substrate_types%3B%0D%0Ause+uuid%3A%3AUuid%3B%0D%0A%0D%0Apub+fn+handle_extrinsic%28extrinsic%3A+%26substrate_types%3A%3ASubstrateUncheckedExtrinsic%29+-%3E+Result%3C%28%29%2C+Box%3Cdyn+std%3A%3Aerror%3A%3AError%3E%3E+%7B%0D%0A++++println%21%28%22%5BSO+File%5D+Received+Substrate+Extrinsic%22%29%3B%0D%0A++++let+id+%3D+Uuid%3A%3Anew_v4%28%29.to_simple%28%29.to_string%28%29%3B%0D%0A++++let+string_extrinsic+%3D+format%21%28%22%7B%3A%3F%7D%22%2C+extrinsic.extrinsic%29%3B%0D%0A++++let+extrinsic_ts+%3D+SubstrateExtrinsicTest+%7B%0D%0A++++++++id%3A+id.clone%28%29%2C%0D%0A++++++++block_number%3A+extrinsic.block_number+as+i64%2C%0D%0A++++++++extrinsic%3A+string_extrinsic%2C%0D%0A++++%7D%3B%0D%0A++++extrinsic_ts.save%28%29%3B%0D%0A++++Ok%28%28%29%29%0D%0A%7D', 'project.yaml': 'schema%3A%0D%0A++file%3A+.%2Fschema.graphql%0D%0A%0D%0AdataSources%3A%0D%0A++-+kind%3A+substrate%0D%0A++++name%3A+substrate-extrinsic%0D%0A++++mapping%3A%0D%0A++++++language%3A+rust%0D%0A++++++handlers%3A%0D%0A++++++++-+handler%3A+handleExtrinsic%0D%0A++++++++++kind%3A+substrate%2FExtrinsicHandler'}
+{
+  "payload": "e3fa4094d667750d351fe4c1d6303343", 
+  "status": "success"
+}</msg>
+<msg timestamp="20210804 19:06:47.589" level="INFO">${compile_res} = {'payload': 'e3fa4094d667750d351fe4c1d6303343', 'status': 'success'}</msg>
+<status status="PASS" starttime="20210804 19:06:40.038" endtime="20210804 19:06:47.590"/>
+</kw>
+<kw name="Should Be Equal" library="BuiltIn">
+<arg>${compile_res["status"]}</arg>
+<arg>success</arg>
+<doc>Fails if the given objects are unequal.</doc>
+<status status="PASS" starttime="20210804 19:06:47.590" endtime="20210804 19:06:47.590"/>
+</kw>
+<kw name="GET" library="RequestsLibrary">
+<var>${status_res}</var>
+<arg>${CODE_COMPILER}/compile/status/${compile_res["payload"]}</arg>
+<arg>expected_status=200</arg>
+<doc>Sends a GET request.</doc>
+<msg timestamp="20210804 19:06:47.595" level="INFO">GET Request : url=http://localhost:5000/compile/status/e3fa4094d667750d351fe4c1d6303343 
+ path_url=/compile/status/e3fa4094d667750d351fe4c1d6303343 
+ headers={'User-Agent': 'python-requests/2.24.0', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive'} 
+ body=None 
+ </msg>
+<msg timestamp="20210804 19:06:47.595" level="INFO">GET Response : url=http://localhost:5000/compile/status/e3fa4094d667750d351fe4c1d6303343 
+ status=200, reason=OK 
+ headers={'Content-Type': 'application/json', 'Content-Length': '48', 'Access-Control-Allow-Origin': '*', 'Server': 'Werkzeug/1.0.1 Python/3.8.10', 'Date': 'Wed, 04 Aug 2021 12:06:47 GMT'} 
+ body={
+  "payload": "", 
+  "status": "in-progress"
+}
+ 
+ </msg>
+<msg timestamp="20210804 19:06:47.595" level="INFO">${status_res} = &lt;Response [200]&gt;</msg>
+<status status="PASS" starttime="20210804 19:06:47.591" endtime="20210804 19:06:47.595"/>
+</kw>
+<kw name="Should Be Equal" library="BuiltIn">
+<arg>${status_res.json()}[status]</arg>
+<arg>in-progress</arg>
+<doc>Fails if the given objects are unequal.</doc>
+<status status="PASS" starttime="20210804 19:06:47.595" endtime="20210804 19:06:47.596"/>
+</kw>
+<status status="PASS" starttime="20210804 19:06:40.024" endtime="20210804 19:06:47.596"/>
+</test>
+<test id="s1-t3" name="Compile and Deploy extrinsic, then check if data exists in DB">
+<kw name="Connect To Database" library="DatabaseLibrary">
+<arg>psycopg2</arg>
+<arg>graph-node</arg>
+<arg>graph-node</arg>
+<arg>let-me-in</arg>
+<arg>localhost</arg>
+<arg>5432</arg>
+<doc>Loads the DB API 2.0 module given `dbapiModuleName` then uses it to
+connect to the database using `dbName`, `dbUsername`, and `dbPassword`.</doc>
+<msg timestamp="20210804 19:06:47.597" level="INFO">Connecting using : psycopg2.connect(database=graph-node, user=graph-node, password=let-me-in, host=localhost, port=5432) </msg>
+<status status="PASS" starttime="20210804 19:06:47.597" endtime="20210804 19:06:47.603"/>
+</kw>
+<kw name="Delete Table If Exists" library="PGConnection">
+<arg>${TABLE_NAME}</arg>
+<msg timestamp="20210804 19:06:47.617" level="INFO">Connecting to the PostgreSQL database...
+Deleting table if exists:
+Database connection closed.</msg>
+<status status="PASS" starttime="20210804 19:06:47.603" endtime="20210804 19:06:47.617"/>
+</kw>
+<kw name="Load Json" library="Request">
+<var>${object}</var>
+<arg>${JSON_PAYLOAD}</arg>
+<msg timestamp="20210804 19:06:47.618" level="INFO">${object} = {'schema.graphql': 'type+SubstrateExtrinsicTest+%40entity+%7B%0D%0A++++id%3A+ID%21%0D%0A++++block_number%3A+BigInt%21%0D%0A++++extrinsic%3A+String%21%0D%0A%7D', 'mapping.rs': 'use+crate%3A%3Amodels%3A...</msg>
+<status status="PASS" starttime="20210804 19:06:47.617" endtime="20210804 19:06:47.619"/>
+</kw>
+<kw name="Post Request" library="Request">
+<var>${compile_res}</var>
+<arg>${CODE_COMPILER}/compile</arg>
+<arg>${object}</arg>
+<msg timestamp="20210804 19:06:54.119" level="INFO">{'schema.graphql': 'type+SubstrateExtrinsicTest+%40entity+%7B%0D%0A++++id%3A+ID%21%0D%0A++++block_number%3A+BigInt%21%0D%0A++++extrinsic%3A+String%21%0D%0A%7D', 'mapping.rs': 'use+crate%3A%3Amodels%3A%3A%2A%3B%0D%0Ause+massbit_chain_substrate%3A%3Adata_type+as+substrate_types%3B%0D%0Ause+uuid%3A%3AUuid%3B%0D%0A%0D%0Apub+fn+handle_extrinsic%28extrinsic%3A+%26substrate_types%3A%3ASubstrateUncheckedExtrinsic%29+-%3E+Result%3C%28%29%2C+Box%3Cdyn+std%3A%3Aerror%3A%3AError%3E%3E+%7B%0D%0A++++println%21%28%22%5BSO+File%5D+Received+Substrate+Extrinsic%22%29%3B%0D%0A++++let+id+%3D+Uuid%3A%3Anew_v4%28%29.to_simple%28%29.to_string%28%29%3B%0D%0A++++let+string_extrinsic+%3D+format%21%28%22%7B%3A%3F%7D%22%2C+extrinsic.extrinsic%29%3B%0D%0A++++let+extrinsic_ts+%3D+SubstrateExtrinsicTest+%7B%0D%0A++++++++id%3A+id.clone%28%29%2C%0D%0A++++++++block_number%3A+extrinsic.block_number+as+i64%2C%0D%0A++++++++extrinsic%3A+string_extrinsic%2C%0D%0A++++%7D%3B%0D%0A++++extrinsic_ts.save%28%29%3B%0D%0A++++Ok%28%28%29%29%0D%0A%7D', 'project.yaml': 'schema%3A%0D%0A++file%3A+.%2Fschema.graphql%0D%0A%0D%0AdataSources%3A%0D%0A++-+kind%3A+substrate%0D%0A++++name%3A+substrate-extrinsic%0D%0A++++mapping%3A%0D%0A++++++language%3A+rust%0D%0A++++++handlers%3A%0D%0A++++++++-+handler%3A+handleExtrinsic%0D%0A++++++++++kind%3A+substrate%2FExtrinsicHandler'}
+{
+  "payload": "1d6763f8703b6695000e863f5a28a3dd", 
+  "status": "success"
+}</msg>
+<msg timestamp="20210804 19:06:54.119" level="INFO">${compile_res} = {'payload': '1d6763f8703b6695000e863f5a28a3dd', 'status': 'success'}</msg>
+<status status="PASS" starttime="20210804 19:06:47.619" endtime="20210804 19:06:54.119"/>
+</kw>
+<kw name="Should Be Equal" library="BuiltIn">
+<arg>${compile_res["status"]}</arg>
+<arg>success</arg>
+<doc>Fails if the given objects are unequal.</doc>
+<status status="PASS" starttime="20210804 19:06:54.120" endtime="20210804 19:06:54.121"/>
+</kw>
+<kw name="Wait Until Keyword Succeeds" library="BuiltIn">
+<arg>60x</arg>
+<arg>10 sec</arg>
+<arg>Pooling Status</arg>
+<arg>${compile_res["payload"]}</arg>
+<doc>Runs the specified keyword and retries if it fails.</doc>
+<kw name="Pooling Status">
+<arg>${compile_res["payload"]}</arg>
+<kw name="GET" library="RequestsLibrary">
+<var>${status_res}</var>
+<arg>${CODE_COMPILER}/compile/status/${payload}</arg>
+<arg>expected_status=200</arg>
+<doc>Sends a GET request.</doc>
+<msg timestamp="20210804 19:06:54.141" level="INFO">GET Request : url=http://localhost:5000/compile/status/1d6763f8703b6695000e863f5a28a3dd 
+ path_url=/compile/status/1d6763f8703b6695000e863f5a28a3dd 
+ headers={'User-Agent': 'python-requests/2.24.0', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive'} 
+ body=None 
+ </msg>
+<msg timestamp="20210804 19:06:54.141" level="INFO">GET Response : url=http://localhost:5000/compile/status/1d6763f8703b6695000e863f5a28a3dd 
+ status=200, reason=OK 
+ headers={'Content-Type': 'application/json', 'Content-Length': '48', 'Access-Control-Allow-Origin': '*', 'Server': 'Werkzeug/1.0.1 Python/3.8.10', 'Date': 'Wed, 04 Aug 2021 12:06:54 GMT'} 
+ body={
+  "payload": "", 
+  "status": "in-progress"
+}
+ 
+ </msg>
+<msg timestamp="20210804 19:06:54.142" level="INFO">${status_res} = &lt;Response [200]&gt;</msg>
+<status status="PASS" starttime="20210804 19:06:54.122" endtime="20210804 19:06:54.142"/>
+</kw>
+<kw name="Should Be Equal" library="BuiltIn">
+<arg>${status_res.json()}[status]</arg>
+<arg>success</arg>
+<doc>Fails if the given objects are unequal.</doc>
+<msg timestamp="20210804 19:06:54.144" level="FAIL">in-progress != success</msg>
+<status status="FAIL" starttime="20210804 19:06:54.142" endtime="20210804 19:06:54.144"/>
+</kw>
+<status status="FAIL" starttime="20210804 19:06:54.121" endtime="20210804 19:06:54.144"/>
+</kw>
+<kw name="Pooling Status">
+<arg>${compile_res["payload"]}</arg>
+<kw name="GET" library="RequestsLibrary">
+<var>${status_res}</var>
+<arg>${CODE_COMPILER}/compile/status/${payload}</arg>
+<arg>expected_status=200</arg>
+<doc>Sends a GET request.</doc>
+<msg timestamp="20210804 19:07:04.168" level="INFO">GET Request : url=http://localhost:5000/compile/status/1d6763f8703b6695000e863f5a28a3dd 
+ path_url=/compile/status/1d6763f8703b6695000e863f5a28a3dd 
+ headers={'User-Agent': 'python-requests/2.24.0', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive'} 
+ body=None 
+ </msg>
+<msg timestamp="20210804 19:07:04.169" level="INFO">GET Response : url=http://localhost:5000/compile/status/1d6763f8703b6695000e863f5a28a3dd 
+ status=200, reason=OK 
+ headers={'Content-Type': 'application/json', 'Content-Length': '48', 'Access-Control-Allow-Origin': '*', 'Server': 'Werkzeug/1.0.1 Python/3.8.10', 'Date': 'Wed, 04 Aug 2021 12:07:04 GMT'} 
+ body={
+  "payload": "", 
+  "status": "in-progress"
+}
+ 
+ </msg>
+<msg timestamp="20210804 19:07:04.169" level="INFO">${status_res} = &lt;Response [200]&gt;</msg>
+<status status="PASS" starttime="20210804 19:07:04.146" endtime="20210804 19:07:04.169"/>
+</kw>
+<kw name="Should Be Equal" library="BuiltIn">
+<arg>${status_res.json()}[status]</arg>
+<arg>success</arg>
+<doc>Fails if the given objects are unequal.</doc>
+<msg timestamp="20210804 19:07:04.171" level="FAIL">in-progress != success</msg>
+<status status="FAIL" starttime="20210804 19:07:04.170" endtime="20210804 19:07:04.171"/>
+</kw>
+<status status="FAIL" starttime="20210804 19:07:04.145" endtime="20210804 19:07:04.172"/>
+</kw>
+<kw name="Pooling Status">
+<arg>${compile_res["payload"]}</arg>
+<kw name="GET" library="RequestsLibrary">
+<var>${status_res}</var>
+<arg>${CODE_COMPILER}/compile/status/${payload}</arg>
+<arg>expected_status=200</arg>
+<doc>Sends a GET request.</doc>
+<msg timestamp="20210804 19:07:14.186" level="INFO">GET Request : url=http://localhost:5000/compile/status/1d6763f8703b6695000e863f5a28a3dd 
+ path_url=/compile/status/1d6763f8703b6695000e863f5a28a3dd 
+ headers={'User-Agent': 'python-requests/2.24.0', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive'} 
+ body=None 
+ </msg>
+<msg timestamp="20210804 19:07:14.187" level="INFO">GET Response : url=http://localhost:5000/compile/status/1d6763f8703b6695000e863f5a28a3dd 
+ status=200, reason=OK 
+ headers={'Content-Type': 'application/json', 'Content-Length': '48', 'Access-Control-Allow-Origin': '*', 'Server': 'Werkzeug/1.0.1 Python/3.8.10', 'Date': 'Wed, 04 Aug 2021 12:07:14 GMT'} 
+ body={
+  "payload": "", 
+  "status": "in-progress"
+}
+ 
+ </msg>
+<msg timestamp="20210804 19:07:14.187" level="INFO">${status_res} = &lt;Response [200]&gt;</msg>
+<status status="PASS" starttime="20210804 19:07:14.175" endtime="20210804 19:07:14.187"/>
+</kw>
+<kw name="Should Be Equal" library="BuiltIn">
+<arg>${status_res.json()}[status]</arg>
+<arg>success</arg>
+<doc>Fails if the given objects are unequal.</doc>
+<msg timestamp="20210804 19:07:14.189" level="FAIL">in-progress != success</msg>
+<status status="FAIL" starttime="20210804 19:07:14.187" endtime="20210804 19:07:14.189"/>
+</kw>
+<status status="FAIL" starttime="20210804 19:07:14.173" endtime="20210804 19:07:14.190"/>
+</kw>
+<kw name="Pooling Status">
+<arg>${compile_res["payload"]}</arg>
+<kw name="GET" library="RequestsLibrary">
+<var>${status_res}</var>
+<arg>${CODE_COMPILER}/compile/status/${payload}</arg>
+<arg>expected_status=200</arg>
+<doc>Sends a GET request.</doc>
+<msg timestamp="20210804 19:07:24.206" level="INFO">GET Request : url=http://localhost:5000/compile/status/1d6763f8703b6695000e863f5a28a3dd 
+ path_url=/compile/status/1d6763f8703b6695000e863f5a28a3dd 
+ headers={'User-Agent': 'python-requests/2.24.0', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive'} 
+ body=None 
+ </msg>
+<msg timestamp="20210804 19:07:24.206" level="INFO">GET Response : url=http://localhost:5000/compile/status/1d6763f8703b6695000e863f5a28a3dd 
+ status=200, reason=OK 
+ headers={'Content-Type': 'application/json', 'Content-Length': '48', 'Access-Control-Allow-Origin': '*', 'Server': 'Werkzeug/1.0.1 Python/3.8.10', 'Date': 'Wed, 04 Aug 2021 12:07:24 GMT'} 
+ body={
+  "payload": "", 
+  "status": "in-progress"
+}
+ 
+ </msg>
+<msg timestamp="20210804 19:07:24.206" level="INFO">${status_res} = &lt;Response [200]&gt;</msg>
+<status status="PASS" starttime="20210804 19:07:24.192" endtime="20210804 19:07:24.206"/>
+</kw>
+<kw name="Should Be Equal" library="BuiltIn">
+<arg>${status_res.json()}[status]</arg>
+<arg>success</arg>
+<doc>Fails if the given objects are unequal.</doc>
+<msg timestamp="20210804 19:07:24.208" level="FAIL">in-progress != success</msg>
+<status status="FAIL" starttime="20210804 19:07:24.206" endtime="20210804 19:07:24.208"/>
+</kw>
+<status status="FAIL" starttime="20210804 19:07:24.191" endtime="20210804 19:07:24.208"/>
+</kw>
+<kw name="Pooling Status">
+<arg>${compile_res["payload"]}</arg>
+<kw name="GET" library="RequestsLibrary">
+<var>${status_res}</var>
+<arg>${CODE_COMPILER}/compile/status/${payload}</arg>
+<arg>expected_status=200</arg>
+<doc>Sends a GET request.</doc>
+<msg timestamp="20210804 19:07:34.224" level="INFO">GET Request : url=http://localhost:5000/compile/status/1d6763f8703b6695000e863f5a28a3dd 
+ path_url=/compile/status/1d6763f8703b6695000e863f5a28a3dd 
+ headers={'User-Agent': 'python-requests/2.24.0', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive'} 
+ body=None 
+ </msg>
+<msg timestamp="20210804 19:07:34.224" level="INFO">GET Response : url=http://localhost:5000/compile/status/1d6763f8703b6695000e863f5a28a3dd 
+ status=200, reason=OK 
+ headers={'Content-Type': 'application/json', 'Content-Length': '48', 'Access-Control-Allow-Origin': '*', 'Server': 'Werkzeug/1.0.1 Python/3.8.10', 'Date': 'Wed, 04 Aug 2021 12:07:34 GMT'} 
+ body={
+  "payload": "", 
+  "status": "in-progress"
+}
+ 
+ </msg>
+<msg timestamp="20210804 19:07:34.224" level="INFO">${status_res} = &lt;Response [200]&gt;</msg>
+<status status="PASS" starttime="20210804 19:07:34.210" endtime="20210804 19:07:34.224"/>
+</kw>
+<kw name="Should Be Equal" library="BuiltIn">
+<arg>${status_res.json()}[status]</arg>
+<arg>success</arg>
+<doc>Fails if the given objects are unequal.</doc>
+<msg timestamp="20210804 19:07:34.226" level="FAIL">in-progress != success</msg>
+<status status="FAIL" starttime="20210804 19:07:34.225" endtime="20210804 19:07:34.226"/>
+</kw>
+<status status="FAIL" starttime="20210804 19:07:34.209" endtime="20210804 19:07:34.227"/>
+</kw>
+<kw name="Pooling Status">
+<arg>${compile_res["payload"]}</arg>
+<kw name="GET" library="RequestsLibrary">
+<var>${status_res}</var>
+<arg>${CODE_COMPILER}/compile/status/${payload}</arg>
+<arg>expected_status=200</arg>
+<doc>Sends a GET request.</doc>
+<msg timestamp="20210804 19:07:44.240" level="INFO">GET Request : url=http://localhost:5000/compile/status/1d6763f8703b6695000e863f5a28a3dd 
+ path_url=/compile/status/1d6763f8703b6695000e863f5a28a3dd 
+ headers={'User-Agent': 'python-requests/2.24.0', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive'} 
+ body=None 
+ </msg>
+<msg timestamp="20210804 19:07:44.240" level="INFO">GET Response : url=http://localhost:5000/compile/status/1d6763f8703b6695000e863f5a28a3dd 
+ status=200, reason=OK 
+ headers={'Content-Type': 'application/json', 'Content-Length': '48', 'Access-Control-Allow-Origin': '*', 'Server': 'Werkzeug/1.0.1 Python/3.8.10', 'Date': 'Wed, 04 Aug 2021 12:07:44 GMT'} 
+ body={
+  "payload": "", 
+  "status": "in-progress"
+}
+ 
+ </msg>
+<msg timestamp="20210804 19:07:44.240" level="INFO">${status_res} = &lt;Response [200]&gt;</msg>
+<status status="PASS" starttime="20210804 19:07:44.230" endtime="20210804 19:07:44.240"/>
+</kw>
+<kw name="Should Be Equal" library="BuiltIn">
+<arg>${status_res.json()}[status]</arg>
+<arg>success</arg>
+<doc>Fails if the given objects are unequal.</doc>
+<msg timestamp="20210804 19:07:44.242" level="FAIL">in-progress != success</msg>
+<status status="FAIL" starttime="20210804 19:07:44.241" endtime="20210804 19:07:44.243"/>
+</kw>
+<status status="FAIL" starttime="20210804 19:07:44.228" endtime="20210804 19:07:44.243"/>
+</kw>
+<kw name="Pooling Status">
+<arg>${compile_res["payload"]}</arg>
+<kw name="GET" library="RequestsLibrary">
+<var>${status_res}</var>
+<arg>${CODE_COMPILER}/compile/status/${payload}</arg>
+<arg>expected_status=200</arg>
+<doc>Sends a GET request.</doc>
+<msg timestamp="20210804 19:07:54.274" level="INFO">GET Request : url=http://localhost:5000/compile/status/1d6763f8703b6695000e863f5a28a3dd 
+ path_url=/compile/status/1d6763f8703b6695000e863f5a28a3dd 
+ headers={'User-Agent': 'python-requests/2.24.0', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive'} 
+ body=None 
+ </msg>
+<msg timestamp="20210804 19:07:54.274" level="INFO">GET Response : url=http://localhost:5000/compile/status/1d6763f8703b6695000e863f5a28a3dd 
+ status=200, reason=OK 
+ headers={'Content-Type': 'application/json', 'Content-Length': '48', 'Access-Control-Allow-Origin': '*', 'Server': 'Werkzeug/1.0.1 Python/3.8.10', 'Date': 'Wed, 04 Aug 2021 12:07:54 GMT'} 
+ body={
+  "payload": "", 
+  "status": "in-progress"
+}
+ 
+ </msg>
+<msg timestamp="20210804 19:07:54.274" level="INFO">${status_res} = &lt;Response [200]&gt;</msg>
+<status status="PASS" starttime="20210804 19:07:54.251" endtime="20210804 19:07:54.274"/>
+</kw>
+<kw name="Should Be Equal" library="BuiltIn">
+<arg>${status_res.json()}[status]</arg>
+<arg>success</arg>
+<doc>Fails if the given objects are unequal.</doc>
+<msg timestamp="20210804 19:07:54.276" level="FAIL">in-progress != success</msg>
+<status status="FAIL" starttime="20210804 19:07:54.275" endtime="20210804 19:07:54.276"/>
+</kw>
+<status status="FAIL" starttime="20210804 19:07:54.244" endtime="20210804 19:07:54.277"/>
+</kw>
+<kw name="Pooling Status">
+<arg>${compile_res["payload"]}</arg>
+<kw name="GET" library="RequestsLibrary">
+<var>${status_res}</var>
+<arg>${CODE_COMPILER}/compile/status/${payload}</arg>
+<arg>expected_status=200</arg>
+<doc>Sends a GET request.</doc>
+<msg timestamp="20210804 19:08:04.285" level="INFO">GET Request : url=http://localhost:5000/compile/status/1d6763f8703b6695000e863f5a28a3dd 
+ path_url=/compile/status/1d6763f8703b6695000e863f5a28a3dd 
+ headers={'User-Agent': 'python-requests/2.24.0', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive'} 
+ body=None 
+ </msg>
+<msg timestamp="20210804 19:08:04.285" level="INFO">GET Response : url=http://localhost:5000/compile/status/1d6763f8703b6695000e863f5a28a3dd 
+ status=200, reason=OK 
+ headers={'Content-Type': 'application/json', 'Content-Length': '48', 'Access-Control-Allow-Origin': '*', 'Server': 'Werkzeug/1.0.1 Python/3.8.10', 'Date': 'Wed, 04 Aug 2021 12:08:04 GMT'} 
+ body={
+  "payload": "", 
+  "status": "in-progress"
+}
+ 
+ </msg>
+<msg timestamp="20210804 19:08:04.285" level="INFO">${status_res} = &lt;Response [200]&gt;</msg>
+<status status="PASS" starttime="20210804 19:08:04.279" endtime="20210804 19:08:04.285"/>
+</kw>
+<kw name="Should Be Equal" library="BuiltIn">
+<arg>${status_res.json()}[status]</arg>
+<arg>success</arg>
+<doc>Fails if the given objects are unequal.</doc>
+<msg timestamp="20210804 19:08:04.287" level="FAIL">in-progress != success</msg>
+<status status="FAIL" starttime="20210804 19:08:04.285" endtime="20210804 19:08:04.287"/>
+</kw>
+<status status="FAIL" starttime="20210804 19:08:04.278" endtime="20210804 19:08:04.288"/>
+</kw>
+<kw name="Pooling Status">
+<arg>${compile_res["payload"]}</arg>
+<kw name="GET" library="RequestsLibrary">
+<var>${status_res}</var>
+<arg>${CODE_COMPILER}/compile/status/${payload}</arg>
+<arg>expected_status=200</arg>
+<doc>Sends a GET request.</doc>
+<msg timestamp="20210804 19:08:14.294" level="INFO">GET Request : url=http://localhost:5000/compile/status/1d6763f8703b6695000e863f5a28a3dd 
+ path_url=/compile/status/1d6763f8703b6695000e863f5a28a3dd 
+ headers={'User-Agent': 'python-requests/2.24.0', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive'} 
+ body=None 
+ </msg>
+<msg timestamp="20210804 19:08:14.294" level="INFO">GET Response : url=http://localhost:5000/compile/status/1d6763f8703b6695000e863f5a28a3dd 
+ status=200, reason=OK 
+ headers={'Content-Type': 'application/json', 'Content-Length': '48', 'Access-Control-Allow-Origin': '*', 'Server': 'Werkzeug/1.0.1 Python/3.8.10', 'Date': 'Wed, 04 Aug 2021 12:08:14 GMT'} 
+ body={
+  "payload": "", 
+  "status": "in-progress"
+}
+ 
+ </msg>
+<msg timestamp="20210804 19:08:14.294" level="INFO">${status_res} = &lt;Response [200]&gt;</msg>
+<status status="PASS" starttime="20210804 19:08:14.290" endtime="20210804 19:08:14.294"/>
+</kw>
+<kw name="Should Be Equal" library="BuiltIn">
+<arg>${status_res.json()}[status]</arg>
+<arg>success</arg>
+<doc>Fails if the given objects are unequal.</doc>
+<msg timestamp="20210804 19:08:14.295" level="FAIL">in-progress != success</msg>
+<status status="FAIL" starttime="20210804 19:08:14.294" endtime="20210804 19:08:14.295"/>
+</kw>
+<status status="FAIL" starttime="20210804 19:08:14.288" endtime="20210804 19:08:14.295"/>
+</kw>
+<kw name="Pooling Status">
+<arg>${compile_res["payload"]}</arg>
+<kw name="GET" library="RequestsLibrary">
+<var>${status_res}</var>
+<arg>${CODE_COMPILER}/compile/status/${payload}</arg>
+<arg>expected_status=200</arg>
+<doc>Sends a GET request.</doc>
+<msg timestamp="20210804 19:08:24.300" level="INFO">GET Request : url=http://localhost:5000/compile/status/1d6763f8703b6695000e863f5a28a3dd 
+ path_url=/compile/status/1d6763f8703b6695000e863f5a28a3dd 
+ headers={'User-Agent': 'python-requests/2.24.0', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive'} 
+ body=None 
+ </msg>
+<msg timestamp="20210804 19:08:24.300" level="INFO">GET Response : url=http://localhost:5000/compile/status/1d6763f8703b6695000e863f5a28a3dd 
+ status=200, reason=OK 
+ headers={'Content-Type': 'application/json', 'Content-Length': '16830', 'Access-Control-Allow-Origin': '*', 'Server': 'Werkzeug/1.0.1 Python/3.8.10', 'Date': 'Wed, 04 Aug 2021 12:08:24 GMT'} 
+ body={
+  "payload": "    Blocking waiting for file lock on package cache\n    Blocking waiting for file lock on package cache\n   Compiling siphasher v0.3.6\n   Compiling fallible-iterator v0.2.0\n   Compiling time v0.1.43\n   Compiling openssl-sys v0.9.61\n   Compiling rand v0.8.4\n   Compiling uuid v0.8.2\n   Compiling failure v0.1.8\n   Compiling env_logger v0.9.0\n   Compiling md-5 v0.9.1\n   Compiling tokio v1.7.1\n   Compiling solana-logger v1.7.4\n   Compiling tiny-bip39 v0.8.0\n   Compiling solana-program v1.8.0 (https://github.com/massbitprotocol/solana.git#65f70668)\n   Compiling solana-frozen-abi v1.7.4\n   Compiling phf_shared v0.8.0\n   Compiling solana-program v1.7.4\n   Compiling derivation-path v0.1.3\n   Compiling diesel_transaction_handles v0.1.1\n   Compiling chrono v0.4.19\n   Compiling phf v0.8.0\n   Compiling ed25519-dalek-bip32 v0.1.1\n   Compiling openssl v0.10.33\n   Compiling native-tls v0.2.7\n   Compiling fixed-hash v0.7.0\n   Compiling tempfile v3.2.0\n   Compiling postgres-protocol v0.6.1\n   Compiling primitive-types v0.9.0\n   Compiling dialoguer v0.8.0\n   Compiling prost-build v0.7.0\n   Compiling substrate-wasm-builder v4.0.0 (https://github.com/paritytech/substrate.git?branch=master#1d7f6e12)\n   Compiling postgres-types v0.2.1\n   Compiling tracing-subscriber v0.2.17\n   Compiling node-template-runtime v3.0.0 (https://github.com/scs/substrate-api-client-test-node?branch=bump-to-polkadot-v0.9.2#7d14a36d)\n   Compiling libp2p-core v0.28.3\n   Compiling parity-util-mem v0.9.0\n   Compiling memory-db v0.26.0\n   Compiling kvdb v0.9.0\n   Compiling sp-database v3.0.0 (https://github.com/paritytech/substrate.git?branch=master#1d7f6e12)\n   Compiling sp-tracing v3.0.0 (https://github.com/paritytech/substrate.git?branch=master#1d7f6e12)\n   Compiling sp-runtime-interface v3.0.0 (https://github.com/paritytech/substrate.git?branch=master#1d7f6e12)\n   Compiling tokio-util v0.6.7\n   Compiling tokio-rustls v0.22.0\n   Compiling sp-core v3.0.0 (https://github.com/paritytech/substrate.git?branch=master#1d7f6e12)\n   Compiling spl-token v3.1.1\n   Compiling spl-memo v3.0.1\n   Compiling h2 v0.3.3\n   Compiling tokio-postgres v0.7.2\n   Compiling tungstenite v0.13.0\n   Compiling libp2p-swarm v0.29.0\n   Compiling libp2p v0.37.1\n   Compiling sp-trie v3.0.0 (https://github.com/paritytech/substrate.git?branch=master#1d7f6e12)\n   Compiling sp-keystore v0.9.0 (https://github.com/paritytech/substrate.git?branch=master#1d7f6e12)\n   Compiling frame-metadata v13.0.0 (https://github.com/paritytech/substrate.git?branch=master#1d7f6e12)\n   Compiling spl-associated-token-account v1.0.2\n   Compiling sp-state-machine v0.9.0 (https://github.com/paritytech/substrate.git?branch=master#1d7f6e12)\n   Compiling index-store v0.1.0 (/home/hughie/8-2021/massbitprotocol/core/index-store)\nwarning: unused import: `QueryResult`\n --&gt; /home/hughie/8-2021/massbitprotocol/core/index-store/src/core.rs:1:53\n  |\n1 | use diesel::{PgConnection, RunQueryDsl, Connection, QueryResult};\n  |                                                     ^^^^^^^^^^^\n  |\n  = note: `#[warn(unused_imports)]` on by default\n\nwarning: unused import: `diesel_transaction_handles::TransactionalConnection`\n --&gt; /home/hughie/8-2021/massbitprotocol/core/index-store/src/core.rs:2:5\n  |\n2 | use diesel_transaction_handles::TransactionalConnection;\n  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\nwarning: unused import: `BTreeMap`\n --&gt; /home/hughie/8-2021/massbitprotocol/core/index-store/src/core.rs:4:33\n  |\n4 | use std::collections::{HashMap, BTreeMap};\n  |                                 ^^^^^^^^\n\nwarning: unused imports: `Duration`, `SystemTimeError`, `self`\n --&gt; /home/hughie/8-2021/massbitprotocol/core/index-store/src/core.rs:5:17\n  |\n5 | use std::time::{self, SystemTime, SystemTimeError, Duration, Instant, UNIX_EPOCH};\n  |                 ^^^^              ^^^^^^^^^^^^^^^  ^^^^^^^^\n\nwarning: unused import: `self`\n --&gt; /home/hughie/8-2021/massbitprotocol/core/index-store/src/core.rs:6:16\n  |\n6 | use std::fmt::{self, Write};\n  |                ^^^^\n\nwarning: unused import: `mpsc`\n --&gt; /home/hughie/8-2021/massbitprotocol/core/index-store/src/core.rs:8:17\n  |\n8 | use std::sync::{mpsc, Arc, Mutex};\n  |                 ^^^^\n\nwarning: unused import: `std::thread`\n --&gt; /home/hughie/8-2021/massbitprotocol/core/index-store/src/core.rs:9:5\n  |\n9 | use std::thread;\n  |     ^^^^^^^^^^^\n\nwarning: unused import: `structmap::value::Value`\n  --&gt; /home/hughie/8-2021/massbitprotocol/core/index-store/src/core.rs:10:5\n   |\n10 | use structmap::value::Value;\n   |     ^^^^^^^^^^^^^^^^^^^^^^^\n\nwarning: unused import: `std::collections::hash_map::RandomState`\n  --&gt; /home/hughie/8-2021/massbitprotocol/core/index-store/src/core.rs:13:5\n   |\n13 | use std::collections::hash_map::RandomState;\n   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\nwarning: unused import: `std::ops::Deref`\n  --&gt; /home/hughie/8-2021/massbitprotocol/core/index-store/src/core.rs:14:5\n   |\n14 | use std::ops::Deref;\n   |     ^^^^^^^^^^^^^^^\n\nwarning: unused import: `diesel::result::Error as DieselError`\n  --&gt; /home/hughie/8-2021/massbitprotocol/core/index-store/src/core.rs:15:5\n   |\n15 | use diesel::result::Error as DieselError;\n   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\nwarning: unused variable: `checking`\n   --&gt; /home/hughie/8-2021/massbitprotocol/core/index-store/src/core.rs:335:13\n    |\n335 |     let mut checking: Vec&lt;String&gt; = Vec::default();\n    |             ^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_checking`\n    |\n    = note: `#[warn(unused_variables)]` on by default\n\nwarning: variable does not need to be mutable\n   --&gt; /home/hughie/8-2021/massbitprotocol/core/index-store/src/core.rs:338:17\n    |\n338 |             let mut tmp = create_chain_dependencies(ref_table, dependencies);\n    |                 ----^^^\n    |                 |\n    |                 help: remove this `mut`\n    |\n    = note: `#[warn(unused_mut)]` on by default\n\nwarning: variable does not need to be mutable\n   --&gt; /home/hughie/8-2021/massbitprotocol/core/index-store/src/core.rs:335:9\n    |\n335 |     let mut checking: Vec&lt;String&gt; = Vec::default();\n    |         ----^^^^^^^^\n    |         |\n    |         help: remove this `mut`\n\nwarning: unused `Result` that must be used\n   --&gt; /home/hughie/8-2021/massbitprotocol/core/index-store/src/core.rs:237:25\n    |\n237 |                         write!(str_val, \"{}\", r);\n    |                         ^^^^^^^^^^^^^^^^^^^^^^^^^\n    |\n    = note: `#[warn(unused_must_use)]` on by default\n    = note: this `Result` may be an `Err` variant, which should be handled\n    = note: this warning originates in a macro (in Nightly builds, run with -Z macro-backtrace for more info)\n\nwarning: unused `Result` that must be used\n   --&gt; /home/hughie/8-2021/massbitprotocol/core/index-store/src/core.rs:239:25\n    |\n239 |                         write!(str_val, \"{}\", r);\n    |                         ^^^^^^^^^^^^^^^^^^^^^^^^^\n    |\n    = note: this `Result` may be an `Err` variant, which should be handled\n    = note: this warning originates in a macro (in Nightly builds, run with -Z macro-backtrace for more info)\n\nwarning: unused `Result` that must be used\n   --&gt; /home/hughie/8-2021/massbitprotocol/core/index-store/src/core.rs:241:25\n    |\n241 |                         write!(str_val, \"{}\", r);\n    |                         ^^^^^^^^^^^^^^^^^^^^^^^^^\n    |\n    = note: this `Result` may be an `Err` variant, which should be handled\n    = note: this warning originates in a macro (in Nightly builds, run with -Z macro-backtrace for more info)\n\nwarning: unused `Result` that must be used\n   --&gt; /home/hughie/8-2021/massbitprotocol/core/index-store/src/core.rs:243:25\n    |\n243 |                         write!(str_val, \"{}\", r);\n    |                         ^^^^^^^^^^^^^^^^^^^^^^^^^\n    |\n    = note: this `Result` may be an `Err` variant, which should be handled\n    = note: this warning originates in a macro (in Nightly builds, run with -Z macro-backtrace for more info)\n\nwarning: unused `Result` that must be used\n   --&gt; /home/hughie/8-2021/massbitprotocol/core/index-store/src/core.rs:245:25\n    |\n245 |                         write!(str_val, \"'{}'\", r);\n    |                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    |\n    = note: this `Result` may be an `Err` variant, which should be handled\n    = note: this warning originates in a macro (in Nightly builds, run with -Z macro-backtrace for more info)\n\nwarning: 19 warnings emitted\n\n   Compiling sp-io v3.0.0 (https://github.com/paritytech/substrate.git?branch=master#1d7f6e12)\n   Compiling sp-application-crypto v3.0.0 (https://github.com/paritytech/substrate.git?branch=master#1d7f6e12)\n   Compiling hyper v0.14.9\n   Compiling sp-runtime v3.0.0 (https://github.com/paritytech/substrate.git?branch=master#1d7f6e12)\n   Compiling sp-version v3.0.0 (https://github.com/paritytech/substrate.git?branch=master#1d7f6e12)\n   Compiling sp-inherents v3.0.0 (https://github.com/paritytech/substrate.git?branch=master#1d7f6e12)\n   Compiling sp-staking v3.0.0 (https://github.com/paritytech/substrate.git?branch=master#1d7f6e12)\n   Compiling sp-consensus-slots v0.9.0 (https://github.com/paritytech/substrate.git?branch=master#1d7f6e12)\n   Compiling sp-api v3.0.0 (https://github.com/paritytech/substrate.git?branch=master#1d7f6e12)\n   Compiling sp-session v3.0.0 (https://github.com/paritytech/substrate.git?branch=master#1d7f6e12)\n   Compiling sp-finality-grandpa v3.0.0 (https://github.com/paritytech/substrate.git?branch=master#1d7f6e12)\n   Compiling sp-offchain v3.0.0 (https://github.com/paritytech/substrate.git?branch=master#1d7f6e12)\n   Compiling frame-system-rpc-runtime-api v3.0.0 (https://github.com/paritytech/substrate.git?branch=master#1d7f6e12)\n   Compiling frame-support v3.0.0 (https://github.com/... (set the log level to DEBUG or TRACE to see the full content) 
+ </msg>
+<msg timestamp="20210804 19:08:24.300" level="INFO">${status_res} = &lt;Response [200]&gt;</msg>
+<status status="PASS" starttime="20210804 19:08:24.296" endtime="20210804 19:08:24.300"/>
+</kw>
+<kw name="Should Be Equal" library="BuiltIn">
+<arg>${status_res.json()}[status]</arg>
+<arg>success</arg>
+<doc>Fails if the given objects are unequal.</doc>
+<status status="PASS" starttime="20210804 19:08:24.301" endtime="20210804 19:08:24.301"/>
+</kw>
+<status status="PASS" starttime="20210804 19:08:24.295" endtime="20210804 19:08:24.302"/>
+</kw>
+<status status="PASS" starttime="20210804 19:06:54.121" endtime="20210804 19:08:24.302"/>
+</kw>
+<kw name="Convert String to JSON" library="RPA.JSON">
+<var>${json}</var>
+<arg>{"compilation_id": "${compile_res["payload"]}"}</arg>
+<doc>Convert a string to a JSON serializable object and return it.</doc>
+<msg timestamp="20210804 19:08:24.302" level="INFO">${json} = {'compilation_id': '1d6763f8703b6695000e863f5a28a3dd'}</msg>
+<status status="PASS" starttime="20210804 19:08:24.302" endtime="20210804 19:08:24.302"/>
+</kw>
+<kw name="Post Request" library="Request">
+<var>${deploy_res}</var>
+<arg>${CODE_COMPILER}/deploy</arg>
+<arg>${json}</arg>
+<msg timestamp="20210804 19:08:24.341" level="INFO">{'compilation_id': '1d6763f8703b6695000e863f5a28a3dd'}
+{
+  "payload": "", 
+  "status": "success"
+}</msg>
+<msg timestamp="20210804 19:08:24.341" level="INFO">${deploy_res} = {'payload': '', 'status': 'success'}</msg>
+<status status="PASS" starttime="20210804 19:08:24.302" endtime="20210804 19:08:24.341"/>
+</kw>
+<kw name="Should Be Equal" library="BuiltIn">
+<arg>${deploy_res["status"]}</arg>
+<arg>success</arg>
+<doc>Fails if the given objects are unequal.</doc>
+<status status="PASS" starttime="20210804 19:08:24.342" endtime="20210804 19:08:24.342"/>
+</kw>
+<kw name="Sleep" library="BuiltIn">
+<arg>20 seconds</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<msg timestamp="20210804 19:08:44.343" level="INFO">Slept 20 seconds</msg>
+<status status="PASS" starttime="20210804 19:08:24.342" endtime="20210804 19:08:44.343"/>
+</kw>
+<kw name="Check If Exists In Database" library="DatabaseLibrary">
+<arg>SELECT * FROM ${TABLE_NAME} FETCH FIRST ROW ONLY</arg>
+<doc>Check if any row would be returned by given the input `selectStatement`. If there are no results, then this will
+throw an AssertionError. Set optional input `sansTran` to True to run command without an explicit transaction
+commit or rollback.</doc>
+<msg timestamp="20210804 19:08:44.344" level="INFO">Executing : Check If Exists In Database  |  SELECT * FROM substrate_extrinsic_test FETCH FIRST ROW ONLY </msg>
+<msg timestamp="20210804 19:08:44.344" level="INFO">Executing : Query  |  SELECT * FROM substrate_extrinsic_test FETCH FIRST ROW ONLY </msg>
+<status status="PASS" starttime="20210804 19:08:44.343" endtime="20210804 19:08:44.346"/>
+</kw>
+<status status="PASS" starttime="20210804 19:06:47.596" endtime="20210804 19:08:44.346"/>
+</test>
+<status status="PASS" starttime="20210804 19:06:39.947" endtime="20210804 19:08:44.347"/>
+</suite>
+<statistics>
+<total>
+<stat pass="3" fail="0" skip="0">All Tests</stat>
+</total>
+<tag>
+</tag>
+<suite>
+<stat pass="3" fail="0" skip="0" id="s1" name="Substrate">Substrate</stat>
+</suite>
+</statistics>
+<errors>
+</errors>
+</robot>

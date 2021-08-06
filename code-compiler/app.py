@@ -21,6 +21,38 @@ cors = CORS(app)
 ###################
 # Helper function #
 ###################
+class CargoCodegen(threading.Thread):
+    """
+    CargoCodgen is to create a new thread to build new code from schema.graphql & project.yml
+
+    """
+
+    def __init__(self, generated_folder):
+        self.stdout = None
+        self.stderr = None
+        self.generated_folder = generated_folder
+        threading.Thread.__init__(self)
+
+    def run(self):
+        try:
+            # Config
+            schema = os.path.join("src/schema.graphql")
+            project = os.path.join("src/project.yaml")
+            folder = os.path.join("src/")
+            command = "$HOME/.cargo/bin/cargo run --manifest-path=../../../Cargo.toml --bin cli -- codegen -s {schema} -c {project} -o {folder} "\
+                .format(schema = schema, project = project, folder = folder)
+            print("Running: " + command)
+
+            # Start
+            output = subprocess.check_output([command], stderr=subprocess.STDOUT,
+                                             shell=True, universal_newlines=True, cwd=self.generated_folder)
+        except subprocess.CalledProcessError as exc:
+            print("Codegen has failed. The result can be found in: " + self.generated_folder)
+            write_to_disk(self.generated_folder + "/error-codegen.txt", exc.output)
+        else:
+            print("Codegen was success. The result can be found in: " + self.generated_folder)
+            write_to_disk(self.generated_folder + "/success-codegen.txt", output)
+
 def write_to_disk(file, data):
     """
     write_to_disk create and save the file to disk
@@ -35,7 +67,7 @@ def write_to_disk(file, data):
     return "ok"
 
 
-def populate_stub_substrate(dst_dir, file_name):
+def populate_stub(dst_dir, file_name):
     """
     populate_stub use the existing stub folder to populate the new folder with it's existing files
 
@@ -44,24 +76,11 @@ def populate_stub_substrate(dst_dir, file_name):
     :param file_name: (String) Path to the file + the file's name that we want to copy
     :return: (String) ok
     """
-    print("Populating " + file_name + " from /stub/substrate")
-    copyfile("./stub/substrate/" + file_name, dst_dir + "/" + file_name)
+    print("Populating " + file_name + " from /stub")
+    copyfile("./stub/" + file_name, dst_dir + "/" + file_name)
 
 
-def populate_stub_solana(dst_dir, file_name):
-    """
-    populate_stub use the existing stub folder to populate the new folder with it's existing files
-
-    :param dst_dir: (String) Path to directory we want to populate data
-
-    :param file_name: (String) Path to the file + the file's name that we want to copy
-    :return: (String) ok
-    """
-    print("Populating " + file_name + " from /stub/solana")
-    copyfile("./stub/solana/" + file_name, dst_dir + "/" + file_name)
-
-
-class CargoBuild(threading.Thread):
+class CargoGenAndBuild(threading.Thread):
     """
     CargoBuild is class that will run `cargo build --release` in a new thread, not blocking the main thread
 
@@ -74,6 +93,10 @@ class CargoBuild(threading.Thread):
         threading.Thread.__init__(self)
 
     def run(self):
+        cargo_codegen = CargoCodegen(self.generated_folder)
+        cargo_codegen.run()  # TODO: This still block the request
+
+        print("Compiling...")
         try:
             # Docker container doesn't know about cargo path so we need to use $HOME
             output = subprocess.check_output(["$HOME/.cargo/bin/cargo build --release"], stderr=subprocess.STDOUT,
@@ -103,35 +126,23 @@ def compile_handler():
 
     # URL-decode the data
     mapping = urllib.parse.unquote_plus(data["mapping.rs"])
-    models = urllib.parse.unquote_plus(data["models.rs"])
     project = urllib.parse.unquote_plus(data["project.yaml"])
-    up = urllib.parse.unquote_plus(data["up.sql"])
-    table = urllib.parse.unquote_plus(data["table"])  # Should refactor this to index_name in the future
-    network_type = urllib.parse.unquote_plus(data["network_type"])
+    schema = urllib.parse.unquote_plus(data["schema.graphql"])
 
-    # Populate data based on network type so we can run compile with enough data
-    if network_type.lower() == "solana":
-        populate_stub_solana(generated_folder, "Cargo.lock")
-        populate_stub_solana(generated_folder, "Cargo.toml")
-        populate_stub_solana(generated_folder, "src/lib.rs")
-        copy_tree("./stub/solana/target", generated_folder + "/target")
-    else:  # If not defined, default network type is substrate
-        populate_stub_substrate(generated_folder, "Cargo.lock")
-        populate_stub_substrate(generated_folder, "Cargo.toml")
-        populate_stub_substrate(generated_folder, "src/lib.rs")
-        copy_tree("./stub/substrate/target", generated_folder + "/target")
+    # Populating stub data
+    populate_stub(generated_folder, "Cargo.lock")
+    populate_stub(generated_folder, "Cargo.toml")
+    copy_tree("stub/target", generated_folder + "/target")
 
     # Save the formatted data from request to disk, ready for compiling
     write_to_disk(generated_folder + "/src/mapping.rs", mapping)
-    write_to_disk(generated_folder + "/src/models.rs", models)
     write_to_disk(generated_folder + "/src/project.yaml", project)
-    write_to_disk(generated_folder + "/src/up.sql", up)
-    write_to_disk(generated_folder + "/src/table.txt", table)  # Should refactor this to index_name in the future
+    write_to_disk(generated_folder + "/src/schema.graphql", schema)
 
-    # Compile the newly created deployment
-    print("Compiling request: " + hash + ". This will take a while!")
-    cargo_build = CargoBuild(generated_folder)
-    cargo_build.start()
+    # Codegen + Build
+    print("Generating code + compiling for: " + hash + ". This will take a while!")
+    cargo_gen_and_build = CargoGenAndBuild(generated_folder)
+    cargo_gen_and_build.start()
 
     return {
                "status": "success",
@@ -182,9 +193,8 @@ def deploy_handler():
 
     # Get the files path from generated/hash folder
     project = os.path.join("./generated", compilation_id, "src/project.yaml")
-    up = os.path.join("./generated", compilation_id, "src/up.sql")
     so = os.path.join("./generated", compilation_id, "target/release/libblock.so")
-    index_name = os.path.join("./generated", compilation_id, "src/table.txt")
+    schema = os.path.join("./generated", compilation_id, "src/schema.graphql")
 
     # Uploading files to IPFS
     if os.environ.get('IPFS_URL'):
@@ -193,45 +203,29 @@ def deploy_handler():
         client = ipfshttpclient.connect()
 
     print("Uploading files to IPFS...")
-    project_res = client.add(project)
-    up_res = client.add(up)
+    config_res = client.add(project)
     so_res = client.add(so)
-
-    # Reading indexer name from table.txt file, should refactor to index.txt later
-    f = open(index_name, "r")
-    index_name = f.read()
-
-    # Read table_name from SQL query
-    f = open(up, "r")
-    up = f.read()
-    pattern = "(.*TABLE\s+)(.*)(\s+\(.*)"
-    match = re.search(pattern, up, re.IGNORECASE)
-    if match:
-        table_name = match.group(2)
-    print("Table name :", table_name)
+    schema_res = client.add(schema)
 
     # Uploading to IPFS result
-    print("project.yaml: " + project_res['Hash'])
-    print("up.sql: " + up_res['Hash'])
+    print("project.yaml: " + config_res['Hash'])
     print("libblock.so: " + so_res['Hash'])
-    print("Indexer name: " + index_name)
+    print("schema.graphql: " + schema_res['Hash'])
 
     # Uploading IPFS files to Index Manager
     if os.environ.get('INDEX_MANAGER_URL'):
         index_manager_url = os.environ.get('INDEX_MANAGER_URL')  # Connection to indexer
     else:
         index_manager_url = 'http://0.0.0.0:3030'
+
     res = requests.post(index_manager_url,
                         json={
                             'jsonrpc': '2.0',
                             'method': 'index_deploy',
                             'params': [
-                                index_name,
-                                project_res['Hash'],
+                                config_res['Hash'],
                                 so_res['Hash'],
-                                up_res['Hash'],
-                                table_name,
-                                "Ipfs"
+                                schema_res['Hash']
                             ],
                             'id': 1,
                         })

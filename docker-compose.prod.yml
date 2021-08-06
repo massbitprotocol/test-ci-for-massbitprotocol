@@ -24,12 +24,32 @@ services:
     restart: always
     environment:
       HASURA_GRAPHQL_DATABASE_URL: postgresql://graph-node:let-me-in@postgres:5432/graph-node
-      HASURA_GRAPHQL_ENABLE_CONSOLE: "true"
       HASURA_GRAPHQL_DEV_MODE: "true"
       HASURA_GRAPHQL_ENABLED_LOG_TYPES: startup, http-log, webhook-log, websocket-log, query-log
-  
+
+  hasura-console:
+    image: sprise/hasura-console:0.1
+    ports:
+      - "3000:3000"
+      - "3001:3001"
+    depends_on:
+      - "postgres"
+    restart: always
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      CDN_ASSETS: "true"
+      ASSETS_PATH: https://graphql-engine-cdn.hasura.io/console/assets
+      ASSETS_VERSION: channel/stable/v1.0
+      ENABLE_TELEMETRY: "true"
+      URL_PREFIX: /
+      DATA_API_URL: http://localhost:8080
+      SERVER_VERSION: v1.0.0
+      CONSOLE_MODE: server
+      ADMIN_SECRET: massbit
+
   code-compiler:
-    image: sprise/code-compiler:0.2
+    image: sprise/code-compiler:latest
     ports:
       - "5000:5000"
     environment:
@@ -46,8 +66,7 @@ services:
     command: bash -c "./target/release/node-template --dev --ws-external"
 
   chain-reader:
-    image: sprise/chain-reader:0.4
-    command: bash -c "sleep 5; ./target/release/chain-reader"
+    image: sprise/chain-reader:latest
     ports:
       - "50051:50051"
     depends_on:
@@ -58,7 +77,7 @@ services:
       NODE_SERVER: ws://substrate-node
 
   indexer:
-    image: sprise/indexer:0.4
+    image: sprise/indexer:latest
     ports:
       - "3030:3030"
     depends_on:
@@ -75,9 +94,10 @@ services:
       IPFS_ADDRESS: ipfs:5001
 
   dashboard:
-    image: sprise/dashboard:0.3
+    image: sprise/dashboard:1.1
     ports:
       - "8088:8088"
     depends_on: # Dashboard App will call to indexer to get indexer detail & code-compiler to compile and deploy new index
+      - "hasura-console"
       - "indexer"
       - "code-compiler"
