@@ -30,6 +30,7 @@ jobs:
            rustup show
            rustup toolchain install nightly-2021-05-20
            rustup target add wasm32-unknown-unknown --toolchain nightly-2021-05-20
+           rustup component add rustfmt
        - uses: Swatinem/rust-cache@v1
        - name: Run test
          run: |
