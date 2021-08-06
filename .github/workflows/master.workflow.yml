@@ -3,7 +3,7 @@ name: Worflow for Master branch
 on:
    push:
      branches:
-       - main
+       - master
 
 jobs:
    # Running test
