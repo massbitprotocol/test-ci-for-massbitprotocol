@@ -1,8 +1,0 @@
-type Block @entity {
-    id: ID!
-    block_height: Int!
-    block_hash: String!
-    timestamp: String!
-}
-
-

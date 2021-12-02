@@ -1,0 +1,42 @@
+[package]
+name = "massbit-sol"
+version = "0.1.1"
+edition = "2018"
+authors = ["Massbit <contact@massbit.io>"]
+description = "CLI for Massbit Solana Indexer"
+homepage = "https://www.massbit.io/"
+repository = "https://github.com/massbitprotocol/massbitprotocol"
+readme = "README.md"
+keywords = ["cli", "solana","massbit"]
+license = "MIT"
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+
+[dependencies]
+anyhow = "1.0.45"
+clap = "2.33.3"
+serde = "1.0"
+serde_json = "1.0"
+serde_derive = "1.0"
+serde_repr = "0.1.7"
+syn = "1.0"
+bytemuck = { version = "1.4.0" }
+arrayref = "0.3.6"
+num_enum = "0.5.0"
+bincode = "1.3.1"
+num-derive = "0.3"
+num-traits = "0.2"
+thiserror = "1.0"
+Inflector = "0.11"
+uriparse = "0.6"
+proptest = "1.0.0"
+proptest-derive = "0.3.0"
+log = "0.4.14"
+lazy_static = "1.4.0"
+minifier = "0.0.41"
+multipart = "0.18.0"
+handlebars = "4.1.4"
+reqwest = { version = "0.11.2", features = ["json", "stream", "blocking","multipart", "trust-dns-resolver"] }
+[[bin]] # Bin to run cli
+name = "massbit-sol"
+path = "./src/main.rs"

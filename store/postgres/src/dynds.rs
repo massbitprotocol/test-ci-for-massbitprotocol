@@ -1,100 +1,49 @@
-//! SQL queries to load dynamic data sources
+use diesel::{
+    dsl::sql,
+    prelude::{ExpressionMethods, QueryDsl, RunQueryDsl},
+};
+use diesel::{insert_into, pg::PgConnection};
 
-use std::ops::Bound;
-
-use diesel::pg::PgConnection;
-use diesel::prelude::{ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl};
-
-use graph::{
+use massbit::{
     components::store::StoredDynamicDataSource,
     constraint_violation,
-    data::subgraph::Source,
-    prelude::{bigdecimal::ToPrimitive, web3::types::H160, BigDecimal, StoreError},
+    data::indexer::Source,
+    prelude::{
+        bigdecimal::ToPrimitive, web3::types::H160, BigDecimal, BlockNumber, BlockPtr,
+        DeploymentHash, StoreError,
+    },
 };
 
-use crate::block_range::first_block_in_range;
-
-// Diesel tables for some of the metadata
-// See also: ed42d219c6704a4aab57ce1ea66698e7
-// Changes to the GraphQL schema might require changes to these tables.
-// The definitions of the tables can be generated with
-//    cargo run -p graph-store-postgres --example layout -- \
-//      -g diesel store/postgres/src/subgraphs.graphql subgraphs
-// BEGIN GENERATED CODE
 table! {
-    subgraphs.dynamic_ethereum_contract_data_source (vid) {
+    dynamic_ethereum_contract_data_source (vid) {
         vid -> BigInt,
-        id -> Text,
-        kind -> Text,
         name -> Text,
-        network -> Nullable<Text>,
-        source -> Text,
-        mapping -> Text,
+        address -> Binary,
+        abi -> Text,
+        start_block -> Integer,
+        // Never read
         ethereum_block_hash -> Binary,
         ethereum_block_number -> Numeric,
         deployment -> Text,
         context -> Nullable<Text>,
-        block_range -> Range<Integer>,
     }
 }
-
-table! {
-    subgraphs.ethereum_contract_source (vid) {
-        vid -> BigInt,
-        id -> Text,
-        address -> Nullable<Binary>,
-        abi -> Text,
-        start_block -> Nullable<Numeric>,
-        block_range -> Range<Integer>,
-    }
-}
-
-// END GENERATED CODE
-
-allow_tables_to_appear_in_same_query!(
-    dynamic_ethereum_contract_data_source,
-    ethereum_contract_source
-);
 
 fn to_source(
     deployment: &str,
-    ds_id: &str,
-    (address, abi, start_block): (Option<Vec<u8>>, String, Option<BigDecimal>),
+    vid: i64,
+    address: Vec<u8>,
+    abi: String,
+    start_block: BlockNumber,
 ) -> Result<Source, StoreError> {
-    // Treat a missing address as an error
-    let address = match address {
-        Some(address) => address,
-        None => {
-            return Err(constraint_violation!(
-                "Dynamic data source {} for deployment {} is missing an address",
-                ds_id,
-                deployment
-            ));
-        }
-    };
     if address.len() != 20 {
         return Err(constraint_violation!(
             "Data source address 0x`{:?}` for dynamic data source {} in deployment {} should have be 20 bytes long but is {} bytes long",
-            address, ds_id, deployment,
+            address, vid, deployment,
             address.len()
         ));
     }
     let address = Some(H160::from_slice(address.as_slice()));
-
-    // Assume a missing start block is the same as 0
-    let start_block = start_block
-        .map(|s| {
-            s.to_u64().ok_or_else(|| {
-                constraint_violation!(
-                    "Start block {:?} for dynamic data source {} in deployment {} is not a u64",
-                    s,
-                    ds_id,
-                    deployment
-                )
-            })
-        })
-        .transpose()?
-        .unwrap_or(0);
 
     Ok(Source {
         address,
@@ -105,39 +54,41 @@ fn to_source(
 
 pub fn load(conn: &PgConnection, id: &str) -> Result<Vec<StoredDynamicDataSource>, StoreError> {
     use dynamic_ethereum_contract_data_source as decds;
-    use ethereum_contract_source as ecs;
 
     // Query to load the data sources. Ordering by the creation block and `vid` makes sure they are
     // in insertion order which is important for the correctness of reverts and the execution order
     // of triggers. See also 8f1bca33-d3b7-4035-affc-fd6161a12448.
     let dds: Vec<_> = decds::table
-        .inner_join(ecs::table.on(decds::source.eq(ecs::id)))
         .filter(decds::deployment.eq(id))
         .select((
-            decds::id,
+            decds::vid,
             decds::name,
             decds::context,
-            (ecs::address, ecs::abi, ecs::start_block),
-            decds::block_range,
+            decds::address,
+            decds::abi,
+            decds::start_block,
+            decds::ethereum_block_number,
         ))
         .order_by((decds::ethereum_block_number, decds::vid))
         .load::<(
-            String,
+            i64,
             String,
             Option<String>,
-            (Option<Vec<u8>>, String, Option<BigDecimal>),
-            (Bound<i32>, Bound<i32>),
+            Vec<u8>,
+            String,
+            BlockNumber,
+            BigDecimal,
         )>(conn)?;
 
     let mut data_sources: Vec<StoredDynamicDataSource> = Vec::new();
-    for (ds_id, name, context, source, range) in dds.into_iter() {
-        let source = to_source(id, &ds_id, source)?;
-        let creation_block = first_block_in_range(&range);
+    for (vid, name, context, address, abi, start_block, creation_block) in dds.into_iter() {
+        let source = to_source(id, vid, address, abi, start_block)?;
+        let creation_block = creation_block.to_i32();
         let data_source = StoredDynamicDataSource {
             name,
             source,
             context,
-            creation_block: creation_block.map(|n| n as u64),
+            creation_block,
         };
 
         if !(data_sources.last().and_then(|d| d.creation_block) <= data_source.creation_block) {
@@ -149,4 +100,59 @@ pub fn load(conn: &PgConnection, id: &str) -> Result<Vec<StoredDynamicDataSource
         data_sources.push(data_source);
     }
     Ok(data_sources)
+}
+
+pub(crate) fn insert(
+    conn: &PgConnection,
+    deployment: &DeploymentHash,
+    data_sources: Vec<StoredDynamicDataSource>,
+    block_ptr: &BlockPtr,
+) -> Result<usize, StoreError> {
+    use dynamic_ethereum_contract_data_source as decds;
+
+    if data_sources.is_empty() {
+        // Avoids a roundtrip to the DB.
+        return Ok(0);
+    }
+
+    let dds: Vec<_> = data_sources
+        .into_iter()
+        .map(|ds| {
+            let StoredDynamicDataSource {
+                name,
+                source:
+                    Source {
+                        address,
+                        abi,
+                        start_block,
+                    },
+                context,
+                creation_block: _,
+            } = ds;
+            let address = match address {
+                Some(address) => address.as_bytes().to_vec(),
+                None => {
+                    return Err(constraint_violation!(
+                        "dynamic data sources must have an address, but `{}` has none",
+                        name
+                    ));
+                }
+            };
+            Ok((
+                decds::deployment.eq(deployment.as_str()),
+                decds::name.eq(name),
+                decds::context.eq(context),
+                decds::address.eq(address),
+                decds::abi.eq(abi),
+                decds::start_block.eq(start_block as i32),
+                decds::ethereum_block_number.eq(sql(&format!("{}::numeric", block_ptr.number))),
+                decds::ethereum_block_hash.eq(block_ptr.hash_slice()),
+            ))
+        })
+        .collect::<Result<_, _>>()?;
+
+    insert_into(decds::table)
+        .values(dds)
+        .execute(conn)
+        .map_err(|e| e.into())
 }

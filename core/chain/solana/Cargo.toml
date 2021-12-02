@@ -6,28 +6,31 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-serde_json = "1.0.64"
+arrayref = "0.3.6"
+serde_json = { version = "1.0", optional = false }
 serde = "1.0.126"
 solana-sdk = "1.7.4"
 log = "0.4.14"
 env_logger = "0.9.0"
 bs58 = "0.4.0"
+lazy_static     = "1.4.0"
 
-############# Solana
 [dependencies.solana-client]
 package = "solana-client"
 git = "https://github.com/massbitprotocol/solana.git"
-#path = "../../../../../solana/solana_offical/solana/client"
-#/home/huy/work/block_chain/solana/solana_offical/solana/client
-#branch = "master"
+branch = "massbit"
 
 [dependencies.solana-program]
 package = "solana-program"
 git = "https://github.com/massbitprotocol/solana.git"
+branch = "massbit"
 
 [dependencies.solana-transaction-status]
 package = "solana-transaction-status"
 git = "https://github.com/massbitprotocol/solana.git"
-#path = "../../../../../solana/solana_offical/solana/transaction-status"
+branch = "massbit"
 
-############# End solana
+[dependencies.spl-token]
+package = "spl-token"
+git = "https://github.com/solana-labs/solana-program-library"
+tag = "token-v3.2.0"

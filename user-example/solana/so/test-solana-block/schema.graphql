@@ -1,0 +1,8 @@
+type SolanaBlockTs @entity {
+    id: ID!
+    block_height: BigInt!
+    block_hash: String!
+    timestamp: String!
+}
+
+

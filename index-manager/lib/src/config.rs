@@ -1,21 +1,20 @@
+use rand::distributions::Alphanumeric;
+use rand::{thread_rng, Rng};
 /**
 *** Objective of this file is to parse the config project.yaml file to get
 *** information like: chain type, index name, ...
 **/
-
 // Generic dependencies
 use serde_yaml::Value;
 use std::iter;
-use rand::{Rng, thread_rng};
-use rand::distributions::Alphanumeric;
 // Massbit dependencies
-use crate::types::stream_mod::{ChainType};
+
+use massbit::firehose::bstream::ChainType;
 
 pub fn get_chain_type(config: &Value) -> ChainType {
     let chain_type = match config["dataSources"][0]["kind"].as_str().unwrap() {
-        "substrate" => ChainType::Substrate,
         "solana" => ChainType::Solana,
-        _ => ChainType::Substrate, // If not provided, assume it's substrate network
+        _ => ChainType::Solana, // If not provided, assume it's Solana network
     };
     chain_type
 }
@@ -23,6 +22,13 @@ pub fn get_chain_type(config: &Value) -> ChainType {
 pub fn get_index_name(config: &Value) -> String {
     let index_name = config["dataSources"][0]["name"].as_str().unwrap();
     String::from(index_name)
+}
+
+pub fn get_mapping_language(config: &Value) -> String {
+    let mapping_language = config["dataSources"][0]["mapping"]["language"]
+        .as_str()
+        .unwrap();
+    String::from(mapping_language)
 }
 
 // Random hash for every new index so it will be unique
@@ -34,4 +40,13 @@ pub fn generate_random_hash() -> String {
         .take(20)
         .collect();
     chars
+}
+
+// Generate mapping file type based on the config value
+pub fn generate_mapping_name_and_type(config: &Value) -> String {
+    if get_mapping_language(config).to_string().contains("wasm") {
+        String::from("mapping.wasm")
+    } else {
+        String::from("mapping.so")
+    }
 }

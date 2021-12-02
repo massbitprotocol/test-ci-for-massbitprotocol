@@ -1,18 +1,26 @@
 [workspace]
 members = [
-    "chain-reader/chain-reader",
-    "mock",
-    "core/chain/substrate",
-    "index-manager/main",
-    "plugin/plugin",
-    "user-example/solana/test-solana-block",
-    "user-example/solana/test-solana-transaction",
-    "user-example/solana/test-solana-log-messages",
-    "user-example/solana/five-tables",
-    "user-example/solana/index-serum",
-    "plugin/test-plugin",
+    "analytics",
+    "apis/solana_api",
+    "apis/indexer_api",
+    "chain-reader",
     "core/chain/solana",
-    "cli"   
+    "core/drive",
+    "core/index-store",
+    "cli",
+    "chain/ethereum",
+    "chain/solana",
+    "chain/solana-sdk",
+    "massbit",
+    "runtime/wasm",
+    "runtime/derive",
+    "store/postgres",
+    "manager",
+    "index-manager/main",
+    "plugin/adapter",
+    "plugin/plugin",
+    "tests",
+    "massbit-sol-cli"
 ]
 exclude = ["code-compiler/generated"]
 

@@ -2,7 +2,7 @@ use crate::graphql::relational::Layout;
 use crate::graphql::schema::Schema;
 
 use clap::ArgMatches;
-use inflector::cases::snakecase::to_snake_case;
+
 use inflector::Inflector;
 use serde::Serialize;
 use std::collections::HashMap;
@@ -24,7 +24,7 @@ pub fn run(matches: &ArgMatches) -> Result<(), Box<dyn Error>> {
 
 #[derive(Serialize)]
 pub struct EntityBinding {
-    pub entities: HashMap<String, (String,String)>,
+    pub entities: HashMap<String, String>,
 }
 
 fn generate_rust_entity(schema_path: &str, output: &str) -> Result<(), Box<dyn Error>> {
@@ -38,8 +38,7 @@ fn generate_rust_entity(schema_path: &str, output: &str) -> Result<(), Box<dyn E
     for (name, model) in layout.models.into_iter() {
         let mut entity = String::new();
         model.as_rust(&mut entity)?;
-        let table_name = name.clone().to_snake_case();
-        binding.entities.insert(name, (table_name, entity));
+        binding.entities.insert(name, entity);
     }
 
     let mut tera = Tera::default();
@@ -53,6 +52,7 @@ fn generate_rust_entity(schema_path: &str, output: &str) -> Result<(), Box<dyn E
 #[derive(Serialize, Default)]
 pub struct HandlerBinding {
     pub handlers: Vec<Handler>,
+    pub chain_types: Vec<String>,
 }
 
 #[derive(Serialize, Default)]
@@ -61,13 +61,23 @@ pub struct Handler {
     pub kind: String,
 }
 
-fn generate_plugin(config_path: &str, output: &str, mapping_gen: bool) -> Result<(), Box<dyn Error>> {
+fn generate_plugin(
+    config_path: &str,
+    output: &str,
+    mapping_gen: bool,
+) -> Result<(), Box<dyn Error>> {
     let f = File::open(config_path)?;
     let manifest: serde_yaml::Value = serde_yaml::from_reader(f)?;
     let mut binding = HandlerBinding::default();
     let data_sources = manifest["dataSources"].as_sequence().unwrap();
     for (_, ds) in data_sources.iter().enumerate() {
         let handlers = ds["mapping"]["handlers"].as_sequence().unwrap();
+        let chain_type = ds["kind"].as_str().unwrap().to_string();
+        // Add chain types list
+        if !binding.chain_types.contains(&chain_type) {
+            binding.chain_types.push(chain_type);
+        }
+
         for (_, handler) in handlers.iter().enumerate() {
             let name = handler["handler"].as_str().map(|s| s.to_string()).unwrap();
             let kind = handler["kind"].as_str().map(|s| s.to_string()).unwrap();
