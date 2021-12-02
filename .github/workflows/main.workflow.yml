@@ -20,7 +20,7 @@ jobs:
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
-          toolchain: 1.53.0
+          toolchain: 1.56.0
           target: wasm32-unknown-unknown
           override: true
       - name: Install missing dependencies
@@ -30,7 +30,11 @@ jobs:
           rustup toolchain install nightly-2021-05-21
           rustup target add wasm32-unknown-unknown --toolchain nightly-2021-05-21
           rustup component add rustfmt
-      - uses: Swatinem/rust-cache@v1  
+          rustup default stable
+          rustup update stable
+      - uses: Swatinem/rust-cache@v1 
+      - name: Checking Cargo version
+        run: cargo --version
       - name: Build release
         run: cargo build --release
 
@@ -86,4 +90,4 @@ jobs:
       - name: Adding Known Hosts
         run: ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
       - name: Deploy with rsync
-        run: rsync -avz ./target/release/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/
+        run: rsync -avz ./target/release/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:./massbitprotocol/deployment/binary/
