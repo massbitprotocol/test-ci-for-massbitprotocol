@@ -37,12 +37,10 @@ jobs:
         run: cargo --version
       - name: Build release
         run: cargo build --release
-
       - name: Allow chain-reader binary to be executable
         run: sudo chmod +x target/release/chain-reader
       - name: Allow indexer-api binary to be executable
         run: sudo chmod +x target/release/indexer-api
-
       - name: List release files
         run: ls -ll target/release
       - name: Upload chain-reader artifact
@@ -59,13 +57,13 @@ jobs:
   ##################
   # Running Deploy #
   ##################
+  # We get the build artifact from the previous step, upload to the server
+  # And start the systemd service files
   deploy:
     needs: [build-cargo]
     name: Deploy
     runs-on: ubuntu-latest
     steps:
-      - name: Check out the repo
-        uses: actions/checkout@v2
       - name: Download artifact
         uses: actions/download-artifact@v2
         with:
@@ -80,8 +78,6 @@ jobs:
           path: target/release/indexer-api
       - name: Allow binary to be executable
         run: sudo chmod +x target/release/indexer-api/indexer-api
-      - name: List files
-        run: ls -ll
       - name: Install SSH Key
         uses: shimataro/ssh-key-action@v2
         with:
@@ -89,5 +85,17 @@ jobs:
           known_hosts: 'just-a-placeholder-so-we-dont-get-errors'
       - name: Adding Known Hosts
         run: ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
-      - name: Deploy with rsync
+      - name: Upload binaries with rsync
         run: rsync -avz ./target/release/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:./massbitprotocol/deployment/binary/
+      - name: Executing remote SSH and start our services
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            sudo systemctl daemon-reload
+            sudo systemctl start chain-reader.service
+            sudo systemctl start indexer-api.service
+            systemctl | grep Solana
