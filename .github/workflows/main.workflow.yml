@@ -1,0 +1,81 @@
+name: Main
+
+on:
+   push:
+     branches:
+       - main
+
+jobs:
+  #################
+  # Running build #
+  #################
+  build-cargo:
+    name: Build Chain Reader & Indexer
+    env:
+      CHAIN_READER: chain-reader
+      INDEXER: indexer-api
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: 1.53.0
+          target: wasm32-unknown-unknown
+          override: true
+      - name: Install missing dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y cmake pkg-config libssl-dev git gcc build-essential clang libclang-dev libpq-dev libudev-dev zlib1g-dev llvm make
+          rustup toolchain install nightly-2021-05-21
+          rustup target add wasm32-unknown-unknown --toolchain nightly-2021-05-21
+          rustup component add rustfmt
+      - name: Build release
+        run: cargo build --release
+
+      - name: Allow chain-reader binary to be executable
+        run: sudo chmod +x target/release/chain-reader
+      - name: Allow indexer-api binary to be executable
+        run: sudo chmod +x target/release/indexer-api
+
+      - name: List release files
+        run: ls -ll target/release
+      - name: Upload chain-reader artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: chain-reader
+          path: target/release/chain-reader
+      - name: Upload indexer artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: indexer-api
+          path: target/release/indexer-api
+
+  ##################
+  # Running Deploy #
+  ##################
+  deploy:
+    needs: [build-cargo]
+    name: Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+      - name: Download artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: chain-reader
+          path: target/release/chain-reader
+      - name: Allow binary to be executable
+        run: sudo chmod +x target/release/chain-reader/chain-reader
+      - name: Download artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: indexer-api
+          path: target/release/indexer-api
+      - name: Allow binary to be executable
+        run: sudo chmod +x target/release/indexer-api/indexer-api
+      - name: List files
+        run: ls -ll
+      - name: Deploy with rsync
+        run: rsync -avz ./target/release/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/
