@@ -3,7 +3,7 @@ name: Main
 on:
    push:
      branches:
-       - main
+       - master
 
 jobs:
   #################
@@ -77,5 +77,12 @@ jobs:
         run: sudo chmod +x target/release/indexer-api/indexer-api
       - name: List files
         run: ls -ll
+      - name: Install SSH Key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.SSH_PRIVATE_KEY }} 
+          known_hosts: 'just-a-placeholder-so-we-dont-get-errors'
+      - name: Adding Known Hosts
+        run: ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
       - name: Deploy with rsync
         run: rsync -avz ./target/release/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/
